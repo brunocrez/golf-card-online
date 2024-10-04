@@ -1,5 +1,11 @@
+import { PreLobbyPage } from './pages/PreLobbyPage'
+
 function App() {
-  return <div className="text-xl font-bold">Hello Game!</div>
+  return (
+    <div>
+      <PreLobbyPage />
+    </div>
+  )
 }
 
 export default App
