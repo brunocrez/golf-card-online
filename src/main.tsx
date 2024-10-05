@@ -1,10 +1,32 @@
+import './index.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { PreLobbyPage } from './pages/PreLobbyPage.tsx'
+import { NotFoundPage } from './pages/NotFoundPage.tsx'
+import { CreateRoomPage } from './pages/CreateRoomPage.tsx'
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Navigate to="/pre-lobby" replace />,
+  },
+  {
+    path: '/pre-lobby',
+    element: <PreLobbyPage />,
+  },
+  {
+    path: '/create-room',
+    element: <CreateRoomPage />,
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
+])
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </StrictMode>,
 )
