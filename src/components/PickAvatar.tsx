@@ -1,23 +1,30 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Dispatch, SetStateAction, useEffect } from 'react'
 import { CircleArrowLeft, CircleArrowRight } from 'lucide-react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { generateAvatars } from '@/utils/generateAvatars'
-import { Routes } from '@/routes'
-import { usePlayerContext } from '@/hooks/usePlayerContext'
 
-export function PickAvatar() {
-  const navigate = useNavigate()
-  const { setPlayer } = usePlayerContext()
-  const [currIndex, setCurrIndex] = useState(0)
-  const [nickname, setNickname] = useState('')
-  const [avatars, setAvatars] = useState<string[]>([])
+interface PickAvatarProps {
+  nickname: string
+  setNickname: Dispatch<SetStateAction<string>>
+  avatars: string[]
+  setAvatars: Dispatch<SetStateAction<string[]>>
+  currIndex: number
+  setCurrIndex: Dispatch<SetStateAction<number>>
+}
 
+export function PickAvatar({
+  nickname,
+  setNickname,
+  avatars,
+  setAvatars,
+  currIndex,
+  setCurrIndex,
+}: PickAvatarProps) {
   useEffect(() => {
     const generatedAvatars = generateAvatars()
     setAvatars(generatedAvatars)
-  }, [])
+  }, [setAvatars])
 
   const handleClickArrowLeft = () => {
     if (currIndex > 0) {
@@ -31,13 +38,8 @@ export function PickAvatar() {
     }
   }
 
-  const handleClickCreateRoom = () => {
-    setPlayer?.({ image: avatars[currIndex], isHost: true, nickname })
-    navigate(Routes.CREATE_ROOM)
-  }
-
   return (
-    <div className="flex flex-col gap-6 px-5">
+    <div className="flex flex-col gap-6">
       <h2
         className="text-center md:text-xl"
         style={{ fontFamily: "'Press Start 2P'" }}
@@ -79,18 +81,6 @@ export function PickAvatar() {
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
       />
-
-      <div className="flex flex-col md:flex-row justify-between gap-4">
-        <Button
-          className="bg-indigo-500 text-white font-bold hover:bg-indigo-400 w-full"
-          onClick={handleClickCreateRoom}
-        >
-          criar nova sala
-        </Button>
-        <Button className="bg-green-500 text-white font-bold hover:bg-green-400 w-full">
-          buscar sala
-        </Button>
-      </div>
     </div>
   )
 }

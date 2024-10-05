@@ -1,9 +1,11 @@
+import { useParams } from 'react-router-dom'
 import { LobbyPlayer } from '@/components/LobbyPlayer'
 import { Button } from '@/components/ui/button'
 import { usePlayerContext } from '@/hooks/usePlayerContext'
 import { Copy } from 'lucide-react'
 
-export function CreateRoomPage() {
+export function LobbyPage() {
+  const { lobbyId } = useParams<{ lobbyId: string }>()
   const { player } = usePlayerContext()
 
   return (
@@ -11,10 +13,10 @@ export function CreateRoomPage() {
       <div className="flex flex-col gap-12">
         <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
           <h2
-            className="text-xs sm:text-lg"
+            className="text-sm sm:text-xl"
             style={{ fontFamily: "'Press Start 2P'" }}
           >
-            sala: xoiwekn2l-dpki
+            sala: {lobbyId}
           </h2>
           <Button className="flex gap-2 w-fit bg-indigo-500 hover:bg-indigo-400">
             copiar código <Copy aria-hidden={true} />

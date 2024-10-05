@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react'
 
-interface Player {
+export interface Player {
   nickname: string
   image: string
   isHost: boolean

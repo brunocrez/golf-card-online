@@ -4,8 +4,9 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { PreLobbyPage } from './pages/PreLobbyPage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
-import { CreateRoomPage } from './pages/CreateRoomPage.tsx'
+import { LobbyPage } from './pages/LobbyPage.tsx'
 import { PlayerContextProvider } from './contexts/PlayerContext.tsx'
+import { MatchRoom } from './pages/MatchRoom.tsx'
 
 const router = createBrowserRouter([
   {
@@ -17,8 +18,12 @@ const router = createBrowserRouter([
     element: <PreLobbyPage />,
   },
   {
-    path: '/create-room',
-    element: <CreateRoomPage />,
+    path: '/lobby/:lobbyId',
+    element: <LobbyPage />,
+  },
+  {
+    path: '/match-room/:lobbyId',
+    element: <MatchRoom />,
   },
   {
     path: '*',
