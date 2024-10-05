@@ -5,10 +5,13 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { generateAvatars } from '@/utils/generateAvatars'
 import { Routes } from '@/routes'
+import { usePlayerContext } from '@/hooks/usePlayerContext'
 
 export function PickAvatar() {
   const navigate = useNavigate()
+  const { setPlayer } = usePlayerContext()
   const [currIndex, setCurrIndex] = useState(0)
+  const [nickname, setNickname] = useState('')
   const [avatars, setAvatars] = useState<string[]>([])
 
   useEffect(() => {
@@ -26,6 +29,11 @@ export function PickAvatar() {
     if (currIndex < avatars.length - 1) {
       setCurrIndex((prev) => prev + 1)
     }
+  }
+
+  const handleClickCreateRoom = () => {
+    setPlayer?.({ image: avatars[currIndex], isHost: true, nickname })
+    navigate(Routes.CREATE_ROOM)
   }
 
   return (
@@ -65,12 +73,17 @@ export function PickAvatar() {
           />
         </Button>
       </div>
-      <Input placeholder="digite o seu apelido" />
+
+      <Input
+        placeholder="digite o seu apelido"
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
+      />
 
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <Button
           className="bg-indigo-500 text-white font-bold hover:bg-indigo-400 w-full"
-          onClick={() => navigate(Routes.CREATE_ROOM)}
+          onClick={handleClickCreateRoom}
         >
           criar nova sala
         </Button>

@@ -5,6 +5,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { PreLobbyPage } from './pages/PreLobbyPage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { CreateRoomPage } from './pages/CreateRoomPage.tsx'
+import { PlayerContextProvider } from './contexts/PlayerContext.tsx'
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <PlayerContextProvider>
+      <RouterProvider router={router} />
+    </PlayerContextProvider>
   </StrictMode>,
 )
