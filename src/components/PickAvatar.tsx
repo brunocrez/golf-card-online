@@ -11,6 +11,7 @@ interface PickAvatarProps {
   setAvatars: Dispatch<SetStateAction<string[]>>
   currIndex: number
   setCurrIndex: Dispatch<SetStateAction<number>>
+  error: string
 }
 
 export function PickAvatar({
@@ -20,6 +21,7 @@ export function PickAvatar({
   setAvatars,
   currIndex,
   setCurrIndex,
+  error,
 }: PickAvatarProps) {
   useEffect(() => {
     const generatedAvatars = generateAvatars()
@@ -80,7 +82,13 @@ export function PickAvatar({
         placeholder="digite o seu apelido"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
+        maxLength={12}
+        className={`${error ? 'border border-red-500' : ''}`}
       />
+
+      {error ? (
+        <span className="text-red-500 text-sm mt-[-20px]">{error}</span>
+      ) : null}
     </div>
   )
 }

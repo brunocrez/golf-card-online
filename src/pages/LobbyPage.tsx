@@ -23,11 +23,11 @@ export function LobbyPage() {
           </Button>
         </div>
         <div className="flex items-center gap-4 border-b-2 border-slate-400 pb-6">
-          <img src={player?.image} alt="" className="w-36 h-36" />
+          <img src={player?.image} alt="avatar" className="w-36 h-36" />
           <div className="flex flex-col gap-2">
             <p>{player?.nickname}</p>
             <p>0 pontos</p>
-            <div className="uppercase bg-indigo-500 text-white p-1 text-center rounded-md w-full max-w-28">
+            <div className="bg-indigo-500 text-white p-1 text-center rounded-md w-full max-w-28">
               host
             </div>
           </div>

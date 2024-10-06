@@ -16,11 +16,20 @@ export function PreLobbyPage() {
   const [open, setOpen] = useState(false)
 
   const handleClickCreateRoom = () => {
+    const { nickname, setError, avatars, currIndex } = props
+
+    if (!nickname.length || nickname.length < 3 || nickname.length > 12) {
+      setError('o apelido deve conter entre 3 e 12 caracteres!')
+      return
+    }
+
+    setError('')
     setPlayer?.({
-      image: props.avatars[props.currIndex],
+      image: avatars[currIndex],
       isHost: true,
-      nickname: props.nickname,
+      nickname,
     })
+
     navigate(`${Routes.LOBBY}/${generateRandomKey()}`)
   }
 

@@ -19,6 +19,17 @@ interface FindRoomDialogProps {
 export function FindRoomDialog({ open, setOpen }: FindRoomDialogProps) {
   const navigate = useNavigate()
   const [value, setValue] = useState('')
+  const [error, setError] = useState('')
+
+  const handleClick = () => {
+    if (!value.length || value.length !== 12) {
+      setError('o código da sala deve conter 12 caracteres!')
+      return
+    }
+
+    setError('')
+    navigate(`${Routes.MATCH_ROOM}/${value}`)
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -32,13 +43,18 @@ export function FindRoomDialog({ open, setOpen }: FindRoomDialogProps) {
               placeholder="digite o código da sala"
               value={value}
               onChange={(e) => setValue(e.target.value)}
+              maxLength={12}
+              className={`${error ? 'border border-red-500' : ''}`}
             />
+            {error ? (
+              <span className="text-red-500 text-sm">{error}</span>
+            ) : null}
           </div>
         </div>
         <DialogFooter className="sm:justify-start">
           <Button
             className="bg-indigo-500 hover:bg-indigo-500 text-white font-bold"
-            onClick={() => navigate(`${Routes.MATCH_ROOM}/${value}`)}
+            onClick={handleClick}
           >
             procurar
           </Button>
