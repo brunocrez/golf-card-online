@@ -1,12 +1,14 @@
 import { useParams } from 'react-router-dom'
 import { LobbyPlayer } from '@/components/LobbyPlayer'
 import { Button } from '@/components/ui/button'
-import { usePlayerContext } from '@/hooks/usePlayerContext'
 import { Copy } from 'lucide-react'
+import { useGetLobby } from '@/hooks/useGetLobby'
+import { filterPlayer } from '@/utils/filterPlayer'
 
 export function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>()
-  const { player } = usePlayerContext()
+  const { data } = useGetLobby(lobbyId ?? '', true, 3000)
+  const result = filterPlayer(data)
 
   return (
     <div className="h-screen flex flex-col justify-center items-center px-5">
@@ -23,9 +25,13 @@ export function LobbyPage() {
           </Button>
         </div>
         <div className="flex items-center gap-4 border-b-2 border-slate-400 pb-6">
-          <img src={player?.image} alt="avatar" className="w-36 h-36" />
+          <img
+            src={result?.hostPlayer?.image}
+            alt="avatar"
+            className="w-36 h-36"
+          />
           <div className="flex flex-col gap-2">
-            <p>{player?.nickname}</p>
+            <p>{result?.hostPlayer?.nickname}</p>
             <p>0 pontos</p>
             <div className="bg-indigo-500 text-white p-1 text-center rounded-md w-full max-w-28">
               host
@@ -34,8 +40,12 @@ export function LobbyPage() {
         </div>
 
         <div className="flex flex-wrap gap-5">
-          {Array.from({ length: 3 }).map((_, idx) => (
-            <LobbyPlayer key={idx} />
+          {result?.regularPlayers?.map((player) => (
+            <LobbyPlayer
+              key={player.id}
+              image={player.image}
+              nickname={player.nickname}
+            />
           ))}
         </div>
 

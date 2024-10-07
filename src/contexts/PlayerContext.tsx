@@ -10,6 +10,7 @@ export interface Player {
   nickname: string
   image: string
   isHost: boolean
+  id: string
 }
 
 interface PlayerContextProps {

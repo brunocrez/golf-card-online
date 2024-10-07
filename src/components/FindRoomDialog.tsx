@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
 import {
@@ -10,6 +10,7 @@ import {
 } from './ui/dialog'
 import { Input } from './ui/input'
 import { Routes } from '@/routes'
+import { useGetLobby } from '@/hooks/useGetLobby'
 
 interface FindRoomDialogProps {
   open: boolean
@@ -20,6 +21,9 @@ export function FindRoomDialog({ open, setOpen }: FindRoomDialogProps) {
   const navigate = useNavigate()
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
+  const [enabled, setEnabled] = useState(false)
+
+  const { data, isSuccess } = useGetLobby(value, enabled)
 
   const handleClick = () => {
     if (!value.length || value.length !== 12) {
@@ -27,9 +31,21 @@ export function FindRoomDialog({ open, setOpen }: FindRoomDialogProps) {
       return
     }
 
-    setError('')
-    navigate(`${Routes.MATCH_ROOM}/${value}`)
+    setEnabled(true)
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (!data) {
+        setError('Não encontramos nenhuma sala com esse código!')
+      } else {
+        setError('')
+        navigate(`${Routes.MATCH_ROOM}/${value}`)
+      }
+
+      setEnabled(false)
+    }
+  }, [data, isSuccess, navigate, value])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

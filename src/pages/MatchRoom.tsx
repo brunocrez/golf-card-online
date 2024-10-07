@@ -1,28 +1,52 @@
 import { useNavigate, useParams } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
 import { Spade, User } from 'lucide-react'
 import { PickAvatar } from '@/components/PickAvatar'
 import { Button } from '@/components/ui/button'
 import { usePickAvatar } from '@/hooks/usePickAvatar'
-import { usePlayerContext } from '@/hooks/usePlayerContext'
 import { Routes } from '@/routes'
+import { useEffect, useState } from 'react'
+import { useJoinLobby } from '@/hooks/useJoinLobby'
 
 export function MatchRoom() {
   const navigate = useNavigate()
   const { lobbyId } = useParams<{ lobbyId: string }>()
-  const { setPlayer } = usePlayerContext()
   const props = usePickAvatar()
+  const { setError } = props
+  const [enabled, setEnabled] = useState(false)
+
+  const playerId = uuid()
+  const { data, isSuccess } = useJoinLobby(
+    lobbyId ?? '',
+    {
+      image: props.avatars[props.currIndex],
+      nickname: props.nickname,
+      playerId,
+    },
+    enabled,
+  )
+
+  console.log(isSuccess)
 
   const handleClick = () => {
-    const { nickname, setError, avatars, currIndex } = props
+    const { nickname } = props
 
     if (!nickname.length || nickname.length < 3 || nickname.length > 12) {
       setError('o apelido deve conter entre 3 e 12 caracteres!')
       return
     }
 
-    setPlayer?.({ nickname, image: avatars[currIndex], isHost: false })
-    navigate(`${Routes.LOBBY}/${lobbyId}`)
+    setEnabled(true)
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (data) {
+        setError('')
+        navigate(`${Routes.LOBBY}/${lobbyId}`)
+      }
+    }
+  }, [data, lobbyId, navigate, setError, isSuccess])
 
   return (
     <div className="h-screen flex justify-center items-center">
