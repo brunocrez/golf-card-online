@@ -7,6 +7,10 @@ import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { LobbyPage } from './pages/LobbyPage.tsx'
 import { PlayerContextProvider } from './contexts/PlayerContext.tsx'
 import { MatchRoom } from './pages/MatchRoom.tsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { GameContextProvider } from './contexts/GameContext.tsx'
+
+const client = new QueryClient()
 
 const router = createBrowserRouter([
   {
@@ -33,8 +37,12 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <PlayerContextProvider>
-      <RouterProvider router={router} />
-    </PlayerContextProvider>
+    <QueryClientProvider client={client}>
+      <GameContextProvider>
+        <PlayerContextProvider>
+          <RouterProvider router={router} />
+        </PlayerContextProvider>
+      </GameContextProvider>
+    </QueryClientProvider>
   </StrictMode>,
 )
