@@ -1,52 +1,45 @@
 import { useNavigate, useParams } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import { Spade, User } from 'lucide-react'
 import { PickAvatar } from '@/components/PickAvatar'
 import { Button } from '@/components/ui/button'
 import { usePickAvatar } from '@/hooks/usePickAvatar'
 import { Routes } from '@/routes'
-import { useEffect, useState } from 'react'
-import { useJoinLobby } from '@/hooks/useJoinLobby'
+import { joinLobby } from '@/services/joinLobby'
+import { useGameContext } from '@/hooks/useGameContext'
 
 export function MatchRoom() {
   const navigate = useNavigate()
-  const { lobbyId } = useParams<{ lobbyId: string }>()
   const props = usePickAvatar()
-  const { setError } = props
-  const [enabled, setEnabled] = useState(false)
+  const { lobbyId } = useParams<{ lobbyId: string }>()
+  const { setLobby } = useGameContext()
 
-  const playerId = uuid()
-  const { data, isSuccess } = useJoinLobby(
-    lobbyId ?? '',
-    {
-      image: props.avatars[props.currIndex],
-      nickname: props.nickname,
-      playerId,
+  const joiningPlayer = {
+    image: props.avatars[props.currIndex],
+    nickname: props.nickname,
+    playerId: uuid(),
+  }
+
+  const { mutateAsync } = useMutation({
+    mutationKey: ['joinLobby', props.nickname],
+    mutationFn: () => joinLobby(lobbyId ?? '', joiningPlayer),
+    onSuccess: (data) => {
+      setLobby({ ...data })
+      navigate(`${Routes.LOBBY}/${lobbyId}`)
     },
-    enabled,
-  )
+  })
 
-  console.log(isSuccess)
-
-  const handleClick = () => {
+  const handleClick = async () => {
     const { nickname } = props
 
     if (!nickname.length || nickname.length < 3 || nickname.length > 12) {
-      setError('o apelido deve conter entre 3 e 12 caracteres!')
+      props.setError('o apelido deve conter entre 3 e 12 caracteres!')
       return
     }
 
-    setEnabled(true)
+    await mutateAsync()
   }
-
-  useEffect(() => {
-    if (isSuccess) {
-      if (data) {
-        setError('')
-        navigate(`${Routes.LOBBY}/${lobbyId}`)
-      }
-    }
-  }, [data, lobbyId, navigate, setError, isSuccess])
 
   return (
     <div className="h-screen flex justify-center items-center">

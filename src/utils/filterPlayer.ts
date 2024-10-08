@@ -1,7 +1,7 @@
-import { GetLobbyResponse } from '@/models/Lobby'
+import { CreateLobbyResponse } from '@/models/Lobby'
 import { IPlayer } from '@/models/Player'
 
-export function filterPlayer(data: GetLobbyResponse | undefined) {
+export function filterPlayer(data: CreateLobbyResponse | undefined) {
   if (!data) {
     return
   }

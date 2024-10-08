@@ -1,14 +1,61 @@
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { LobbyPlayer } from '@/components/LobbyPlayer'
 import { Button } from '@/components/ui/button'
 import { Copy } from 'lucide-react'
-import { useGetLobby } from '@/hooks/useGetLobby'
+import { useGameContext } from '@/hooks/useGameContext'
 import { filterPlayer } from '@/utils/filterPlayer'
 
 export function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>()
-  const { data } = useGetLobby(lobbyId ?? '', true, 3000)
-  const result = filterPlayer(data)
+  const { lobby, setLobby } = useGameContext()
+  const res = filterPlayer(lobby)
+
+  useEffect(() => {
+    if (!lobbyId) {
+      console.error('Lobby ID não está definido.')
+      return
+    }
+
+    const ws = new WebSocket(`ws://localhost:8080/lobby/ws/${lobbyId}`)
+
+    ws.onopen = () => {
+      console.log(`Conectado ao WebSocket no lobby: ${lobbyId}`)
+    }
+
+    ws.onmessage = (e) => {
+      const data = JSON.parse(e.data)
+
+      if (data.type === 'playerJoined') {
+        const newPlayer = data.player
+
+        setLobby((prevLobby) => {
+          if (!prevLobby) {
+            return prevLobby
+          }
+
+          return {
+            ...prevLobby,
+            players: [...prevLobby.players, newPlayer],
+            currentPlayers: prevLobby.currentPlayers + 1,
+          }
+        })
+      }
+    }
+
+    ws.onerror = (error) => {
+      console.error('Erro no WebSocket:', error)
+    }
+
+    ws.onclose = () => {
+      console.log('Conexão WebSocket fechada')
+    }
+
+    return () => {
+      ws.close()
+      console.log('WebSocket desconectado')
+    }
+  }, [lobbyId, setLobby])
 
   return (
     <div className="h-screen flex flex-col justify-center items-center px-5">
@@ -26,12 +73,12 @@ export function LobbyPage() {
         </div>
         <div className="flex items-center gap-4 border-b-2 border-slate-400 pb-6">
           <img
-            src={result?.hostPlayer?.image}
+            src={res?.hostPlayer?.image}
             alt="avatar"
             className="w-36 h-36"
           />
           <div className="flex flex-col gap-2">
-            <p>{result?.hostPlayer?.nickname}</p>
+            <p>{res?.hostPlayer?.nickname}</p>
             <p>0 pontos</p>
             <div className="bg-indigo-500 text-white p-1 text-center rounded-md w-full max-w-28">
               host
@@ -40,7 +87,7 @@ export function LobbyPage() {
         </div>
 
         <div className="flex flex-wrap gap-5">
-          {result?.regularPlayers?.map((player) => (
+          {res?.regularPlayers?.map((player) => (
             <LobbyPlayer
               key={player.id}
               image={player.image}

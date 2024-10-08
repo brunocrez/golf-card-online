@@ -1,5 +1,10 @@
 import { IPlayer } from './Player'
 
+export interface CreateLobbyRequest {
+  nickname: string
+  playerId: string
+  image: string
+}
 export interface CreateLobbyResponse {
   id: string
   host: string
@@ -12,10 +17,6 @@ export interface CreateLobbyResponse {
 
 export type GetLobbyResponse = CreateLobbyResponse
 
-export interface CreateLobbyRequest {
-  nickname: string
-  playerId: string
-  image: string
-}
-
 export type JoinLobbyRequest = CreateLobbyRequest
+
+export type JoinLobbyResponse = CreateLobbyResponse
