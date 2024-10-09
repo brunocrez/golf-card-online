@@ -1,34 +1,27 @@
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import { Spade, User } from 'lucide-react'
 import { PickAvatar } from '@/components/PickAvatar'
 import { Button } from '@/components/ui/button'
 import { usePickAvatar } from '@/hooks/usePickAvatar'
 import { Routes } from '@/routes'
-import { joinLobby } from '@/services/joinLobby'
 import { useGameContext } from '@/hooks/useGameContext'
+import { useJoinLobby } from '@/hooks/useJoinLobby'
 
 export function MatchRoom() {
   const navigate = useNavigate()
   const props = usePickAvatar()
   const { lobbyId } = useParams<{ lobbyId: string }>()
-  const { setLobby } = useGameContext()
+  const { lobby } = useGameContext()
 
-  const joiningPlayer = {
+  const player = {
     image: props.avatars[props.currIndex],
     nickname: props.nickname,
     playerId: uuid(),
   }
 
-  const { mutateAsync } = useMutation({
-    mutationKey: ['joinLobby', props.nickname],
-    mutationFn: () => joinLobby(lobbyId ?? '', joiningPlayer),
-    onSuccess: (data) => {
-      setLobby({ ...data })
-      navigate(`${Routes.LOBBY}/${lobbyId}`)
-    },
-  })
+  const { mutateAsync } = useJoinLobby(lobbyId ?? '', player)
 
   const handleClick = async () => {
     const { nickname } = props
@@ -40,6 +33,12 @@ export function MatchRoom() {
 
     await mutateAsync()
   }
+
+  useEffect(() => {
+    if (!lobby) {
+      navigate(Routes.PRE_LOBBY)
+    }
+  }, [lobby, navigate])
 
   return (
     <div className="h-screen flex justify-center items-center">

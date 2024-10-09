@@ -1,20 +1,20 @@
 import { useNavigate } from 'react-router-dom'
-import { CreateLobbyRequest } from '@/models/Lobby'
-import { createLobby } from '@/services/createLobby'
 import { useMutation } from '@tanstack/react-query'
+import { joinLobby } from '@/services/joinLobby'
 import { useGameContext } from './useGameContext'
 import { Routes } from '@/routes'
+import { JoinLobbyRequest } from '@/models/Lobby'
 
-export function useCreateLobby(payload: CreateLobbyRequest) {
+export function useJoinLobby(lobbyId: string, payload: JoinLobbyRequest) {
   const navigate = useNavigate()
   const { setLobby } = useGameContext()
 
   return useMutation({
-    mutationKey: ['useCreateLobby', payload.nickname],
-    mutationFn: () => createLobby(payload),
+    mutationKey: ['useJoinLobby', payload.nickname],
+    mutationFn: () => joinLobby(lobbyId ?? '', payload),
     onSuccess: (data) => {
       setLobby({ ...data })
-      navigate(`${Routes.LOBBY}/${data.id}`)
+      navigate(`${Routes.LOBBY}/${lobbyId}`)
     },
   })
 }

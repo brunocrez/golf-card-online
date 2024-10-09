@@ -11,17 +11,19 @@ import {
 import { Input } from './ui/input'
 import { Routes } from '@/routes'
 import { useGetLobby } from '@/hooks/useGetLobby'
+import { useGameContext } from '@/hooks/useGameContext'
 
-interface FindRoomDialogProps {
+interface FindLobbyDialogProps {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export function FindRoomDialog({ open, setOpen }: FindRoomDialogProps) {
+export function FindLobbyDialog({ open, setOpen }: FindLobbyDialogProps) {
   const navigate = useNavigate()
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
   const [enabled, setEnabled] = useState(false)
+  const { setLobby } = useGameContext()
 
   const { data, isSuccess } = useGetLobby(value, enabled)
 
@@ -40,12 +42,13 @@ export function FindRoomDialog({ open, setOpen }: FindRoomDialogProps) {
         setError('Não encontramos nenhuma sala com esse código!')
       } else {
         setError('')
+        setLobby({ ...data })
         navigate(`${Routes.MATCH_ROOM}/${value}`)
       }
 
       setEnabled(false)
     }
-  }, [data, isSuccess, navigate, value])
+  }, [data, isSuccess, navigate, value, setLobby])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
