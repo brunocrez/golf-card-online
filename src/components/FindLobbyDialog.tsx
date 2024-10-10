@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
 import {
@@ -10,8 +10,9 @@ import {
 } from './ui/dialog'
 import { Input } from './ui/input'
 import { Routes } from '@/routes'
-import { useGetLobby } from '@/hooks/useGetLobby'
 import { useGameContext } from '@/hooks/useGameContext'
+import { useSocketConnection } from '@/hooks/useSocketConnection'
+import { GetLobbyResponse } from '@/models/Lobby'
 
 interface FindLobbyDialogProps {
   open: boolean
@@ -22,10 +23,8 @@ export function FindLobbyDialog({ open, setOpen }: FindLobbyDialogProps) {
   const navigate = useNavigate()
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
-  const [enabled, setEnabled] = useState(false)
   const { setLobby } = useGameContext()
-
-  const { data, isSuccess } = useGetLobby(value, enabled)
+  const { socket } = useSocketConnection()
 
   const handleClick = () => {
     if (!value.length || value.length !== 12) {
@@ -33,22 +32,18 @@ export function FindLobbyDialog({ open, setOpen }: FindLobbyDialogProps) {
       return
     }
 
-    setEnabled(true)
+    socket.emit('get-lobby', value)
+
+    socket.on('lobby-not-found', (message: string) => {
+      setError(message)
+    })
+
+    socket.on('lobby-details', (lobby: GetLobbyResponse) => {
+      setError('')
+      setLobby(lobby)
+      navigate(`${Routes.MATCH_ROOM}/${value}`)
+    })
   }
-
-  useEffect(() => {
-    if (isSuccess) {
-      if (!data) {
-        setError('Não encontramos nenhuma sala com esse código!')
-      } else {
-        setError('')
-        setLobby({ ...data })
-        navigate(`${Routes.MATCH_ROOM}/${value}`)
-      }
-
-      setEnabled(false)
-    }
-  }, [data, isSuccess, navigate, value, setLobby])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

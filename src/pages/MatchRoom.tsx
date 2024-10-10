@@ -1,27 +1,31 @@
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
 import { Spade, User } from 'lucide-react'
 import { PickAvatar } from '@/components/PickAvatar'
 import { Button } from '@/components/ui/button'
 import { usePickAvatar } from '@/hooks/usePickAvatar'
 import { Routes } from '@/routes'
 import { useGameContext } from '@/hooks/useGameContext'
-import { useJoinLobby } from '@/hooks/useJoinLobby'
+import { useSocketConnection } from '@/hooks/useSocketConnection'
+import { JoinLobbyResponse } from '@/models/Lobby'
 
 export function MatchRoom() {
   const navigate = useNavigate()
   const props = usePickAvatar()
   const { lobbyId } = useParams<{ lobbyId: string }>()
-  const { lobby } = useGameContext()
+  const { lobby, setLobby } = useGameContext()
+  const { socket } = useSocketConnection()
 
-  const player = {
-    image: props.avatars[props.currIndex],
-    nickname: props.nickname,
-    playerId: uuid(),
-  }
+  useEffect(() => {
+    socket.on('joined-lobby', (payload: JoinLobbyResponse) => {
+      setLobby(payload)
+      navigate(`${Routes.LOBBY}/${payload.id}`)
+    })
 
-  const { mutateAsync } = useJoinLobby(lobbyId ?? '', player)
+    return () => {
+      socket.off('joined-lobby')
+    }
+  })
 
   const handleClick = async () => {
     const { nickname } = props
@@ -31,7 +35,14 @@ export function MatchRoom() {
       return
     }
 
-    await mutateAsync()
+    const payload = {
+      image: props.avatars[props.currIndex],
+      nickname: props.nickname,
+      playerId: socket.id,
+      lobbyId,
+    }
+
+    socket.emit('join-lobby', payload)
   }
 
   useEffect(() => {

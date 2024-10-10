@@ -8,11 +8,14 @@ import { filterPlayer } from '@/utils/filterPlayer'
 import { Routes } from '@/routes'
 import { useBlockLeaving } from '@/hooks/useBlockLeaving'
 import { LeavingDialog } from '@/components/LeavingDialog'
+import { useSocketConnection } from '@/hooks/useSocketConnection'
+import { GetLobbyResponse } from '@/models/Lobby'
 
 export function LobbyPage() {
   const navigate = useNavigate()
   const { lobbyId } = useParams<{ lobbyId: string }>()
   const { lobby, setLobby } = useGameContext()
+  const { socket } = useSocketConnection()
   const { state, proceed, reset } = useBlockLeaving()
   const res = filterPlayer(lobby)
 
@@ -20,49 +23,20 @@ export function LobbyPage() {
 
   useEffect(() => {
     if (!lobby || !lobbyId) {
-      navigate(Routes.PRE_LOBBY)
-      return
+      return navigate(Routes.PRE_LOBBY)
     }
 
-    const ws = new WebSocket(`ws://localhost:8080/lobby/ws/${lobbyId}`)
-
-    ws.onopen = () => {
-      console.log(`Conectado ao WebSocket no lobby: ${lobbyId}`)
+    const handleUpdatedLobby = (data: GetLobbyResponse) => {
+      setLobby({ ...data })
     }
 
-    ws.onmessage = (e) => {
-      const data = JSON.parse(e.data)
-
-      if (data.type === 'playerJoined') {
-        const newPlayer = data.player
-
-        setLobby((prevLobby) => {
-          if (!prevLobby) {
-            return prevLobby
-          }
-
-          return {
-            ...prevLobby,
-            players: [...prevLobby.players, newPlayer],
-            currentPlayers: prevLobby.currentPlayers + 1,
-          }
-        })
-      }
-    }
-
-    ws.onerror = (error) => {
-      console.error('Erro no WebSocket:', error)
-    }
-
-    ws.onclose = () => {
-      console.log('Conexão WebSocket fechada')
-    }
+    socket.on('updated-lobby', handleUpdatedLobby)
 
     return () => {
-      ws.close()
-      console.log('WebSocket desconectado')
+      socket.off('updated-lobby', handleUpdatedLobby)
+      socket.emit('leave-lobby', { lobbyId })
     }
-  }, [lobbyId, setLobby, navigate, lobby])
+  }, [lobbyId, navigate, socket, lobby, setLobby])
 
   return (
     <>
@@ -104,7 +78,7 @@ export function LobbyPage() {
           <div className="flex flex-wrap gap-5">
             {res?.regularPlayers?.map((player) => (
               <LobbyPlayer
-                key={player.id}
+                key={player.playerId}
                 image={player.image}
                 nickname={player.nickname}
               />

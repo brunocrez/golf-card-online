@@ -8,8 +8,8 @@ export function filterPlayer(data: CreateLobbyResponse | undefined) {
 
   const { host, players } = data
 
-  const hostPlayer = players.find((player: IPlayer) => player.id === host)
-  const regularPlayers = players.filter((player) => player.id !== host)
+  const hostPlayer = players.find((player: IPlayer) => player.playerId === host)
+  const regularPlayers = players.filter((player) => player.playerId !== host)
 
   return { hostPlayer, regularPlayers }
 }

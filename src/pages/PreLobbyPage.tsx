@@ -1,24 +1,33 @@
-import { useState } from 'react'
-import { v4 as uuid } from 'uuid'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PickAvatar } from '@/components/PickAvatar'
 import { Button } from '@/components/ui/button'
 import { usePickAvatar } from '@/hooks/usePickAvatar'
 import { FindLobbyDialog } from '@/components/FindLobbyDialog'
-import { useCreateLobby } from '@/hooks/useCreateLobby'
+import { useSocketConnection } from '@/hooks/useSocketConnection'
+import { Routes } from '@/routes'
+import { CreateLobbyResponse } from '@/models/Lobby'
+import { useGameContext } from '@/hooks/useGameContext'
 
 export function PreLobbyPage() {
+  const navigate = useNavigate()
   const props = usePickAvatar()
+  const { socket } = useSocketConnection()
+  const { setLobby } = useGameContext()
   const [open, setOpen] = useState(false)
 
-  const player = {
-    image: props.avatars[props.currIndex],
-    nickname: props.nickname,
-    playerId: uuid(),
-  }
+  useEffect(() => {
+    socket.on('lobby-created', (lobby: CreateLobbyResponse) => {
+      setLobby(lobby)
+      navigate(`${Routes.LOBBY}/${lobby.id}`)
+    })
 
-  const { mutateAsync } = useCreateLobby(player)
+    return () => {
+      socket.off('lobby-created')
+    }
+  }, [socket, setLobby, navigate])
 
-  const handleClickCreateLobby = async () => {
+  const handleClickCreateLobby = () => {
     const { nickname, setError } = props
 
     if (!nickname.length || nickname.length < 3 || nickname.length > 12) {
@@ -26,8 +35,15 @@ export function PreLobbyPage() {
       return
     }
 
+    const player = {
+      image: props.avatars[props.currIndex],
+      nickname: props.nickname,
+      playerId: socket.id,
+    }
+
     setError('')
-    await mutateAsync()
+
+    socket.emit('create-lobby', player)
   }
 
   return (
