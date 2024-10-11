@@ -1,21 +1,21 @@
+import { generateAvatars } from '@/utils/generateAvatars'
 import {
   createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
+  useEffect,
   useState,
 } from 'react'
 
-export interface Player {
-  nickname: string
-  image: string
-  isHost: boolean
-  id: string
-}
-
 interface PlayerContextProps {
-  player: Player | undefined
-  setPlayer: Dispatch<SetStateAction<Player | undefined>>
+  nickname: string
+  setNickname: Dispatch<SetStateAction<string>>
+  avatars: string[]
+  currIndex: number
+  setCurrIndex: Dispatch<SetStateAction<number>>
+  error: string
+  setError: Dispatch<SetStateAction<string>>
 }
 
 export const PlayerContext = createContext<PlayerContextProps>(
@@ -29,10 +29,28 @@ interface PlayerContextProviderProps {
 export function PlayerContextProvider({
   children,
 }: PlayerContextProviderProps) {
-  const [player, setPlayer] = useState<Player | undefined>(undefined)
+  const [nickname, setNickname] = useState('')
+  const [avatars, setAvatars] = useState<string[]>([])
+  const [currIndex, setCurrIndex] = useState(0)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const generatedAvatars = generateAvatars()
+    setAvatars(generatedAvatars)
+  }, [setAvatars])
 
   return (
-    <PlayerContext.Provider value={{ player, setPlayer }}>
+    <PlayerContext.Provider
+      value={{
+        nickname,
+        setNickname,
+        avatars,
+        currIndex,
+        setCurrIndex,
+        error,
+        setError,
+      }}
+    >
       {children}
     </PlayerContext.Provider>
   )

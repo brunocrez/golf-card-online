@@ -34,7 +34,6 @@ export function LobbyPage() {
 
     return () => {
       socket.off('updated-lobby', handleUpdatedLobby)
-      socket.emit('leave-lobby', { lobbyId })
     }
   }, [lobbyId, navigate, socket, lobby, setLobby])
 
@@ -47,7 +46,7 @@ export function LobbyPage() {
         reset={reset}
       />
 
-      <div className="h-screen flex flex-col justify-center items-center px-5">
+      <div className="h-screen w-full flex flex-col justify-center items-center px-5 relative">
         <div className="flex flex-col gap-12">
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <h2
@@ -85,9 +84,18 @@ export function LobbyPage() {
             ))}
           </div>
 
-          <Button className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl">
-            iniciar jogo
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button className="bg-purple-600 hover:bg-green-400 text-white font-bold text-xl p-7">
+              regras básicas
+            </Button>
+            <Button className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl p-7">
+              iniciar jogo
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex justify-center items-center absolute w-16 h-10 rounded-l-md bg-slate-700 top-4 right-0">
+          <span className="text-white text-xs">regras</span>
         </div>
       </div>
     </>

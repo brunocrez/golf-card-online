@@ -3,18 +3,21 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Spade, User } from 'lucide-react'
 import { PickAvatar } from '@/components/PickAvatar'
 import { Button } from '@/components/ui/button'
-import { usePickAvatar } from '@/hooks/usePickAvatar'
 import { Routes } from '@/routes'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
 import { JoinLobbyResponse } from '@/models/Lobby'
+import { IError } from '@/models/Error'
+import { useToast } from '@/hooks/use-toast'
+import { usePlayerContext } from '@/hooks/usePlayerContext'
 
 export function MatchRoom() {
   const navigate = useNavigate()
-  const props = usePickAvatar()
+  const { nickname, setError, avatars, currIndex } = usePlayerContext()
   const { lobbyId } = useParams<{ lobbyId: string }>()
   const { lobby, setLobby } = useGameContext()
   const { socket } = useSocketConnection()
+  const { toast } = useToast()
 
   useEffect(() => {
     socket.on('joined-lobby', (payload: JoinLobbyResponse) => {
@@ -22,22 +25,30 @@ export function MatchRoom() {
       navigate(`${Routes.LOBBY}/${payload.id}`)
     })
 
+    socket.on('full-lobby', (payload: IError) => {
+      setLobby(payload.lobby)
+      toast({
+        title: payload.message,
+        className: 'bg-red-500 text-white font-bold',
+        duration: 3 * 1000, // 3 seconds
+      })
+    })
+
     return () => {
       socket.off('joined-lobby')
+      socket.off('full-lobby')
     }
-  })
+  }, [setLobby, navigate, socket, toast])
 
   const handleClick = async () => {
-    const { nickname } = props
-
     if (!nickname.length || nickname.length < 3 || nickname.length > 12) {
-      props.setError('o apelido deve conter entre 3 e 12 caracteres!')
+      setError('o apelido deve conter entre 3 e 12 caracteres!')
       return
     }
 
     const payload = {
-      image: props.avatars[props.currIndex],
-      nickname: props.nickname,
+      image: avatars[currIndex],
+      nickname: nickname,
       playerId: socket.id,
       lobbyId,
     }
@@ -55,9 +66,7 @@ export function MatchRoom() {
     <div className="h-screen flex justify-center items-center">
       <div className="flex flex-col gap-12">
         <div className="flex flex-col md:flex-row gap-12">
-          <section>
-            <PickAvatar {...props} />
-          </section>
+          <PickAvatar />
           <section className="flex flex-col gap-4">
             <div className="flex items-center gap-6">
               <div className="w-32 h-32 rounded-full p-2 border-2 border-slate-300 flex justify-center items-center">
@@ -65,7 +74,7 @@ export function MatchRoom() {
               </div>
               <div>
                 <p className="text-slate-500 font-bold">Partidas</p>
-                <p className="text-slate-600">0/6</p>
+                <p className="text-slate-600">0/{lobby?.rounds}</p>
               </div>
             </div>
             <div className="flex items-center gap-6">
@@ -74,7 +83,9 @@ export function MatchRoom() {
               </div>
               <div>
                 <p className="text-slate-500 font-bold">Jogadores</p>
-                <p className="text-slate-600">2/6</p>
+                <p className="text-slate-600">
+                  {lobby?.currentPlayers}/{lobby?.maxPlayers}
+                </p>
               </div>
             </div>
           </section>

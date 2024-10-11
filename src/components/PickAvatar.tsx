@@ -1,32 +1,11 @@
-import { Dispatch, SetStateAction, useEffect } from 'react'
 import { CircleArrowLeft, CircleArrowRight } from 'lucide-react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
-import { generateAvatars } from '@/utils/generateAvatars'
+import { usePlayerContext } from '@/hooks/usePlayerContext'
 
-interface PickAvatarProps {
-  nickname: string
-  setNickname: Dispatch<SetStateAction<string>>
-  avatars: string[]
-  setAvatars: Dispatch<SetStateAction<string[]>>
-  currIndex: number
-  setCurrIndex: Dispatch<SetStateAction<number>>
-  error: string
-}
-
-export function PickAvatar({
-  nickname,
-  setNickname,
-  avatars,
-  setAvatars,
-  currIndex,
-  setCurrIndex,
-  error,
-}: PickAvatarProps) {
-  useEffect(() => {
-    const generatedAvatars = generateAvatars()
-    setAvatars(generatedAvatars)
-  }, [setAvatars])
+export function PickAvatar() {
+  const { avatars, currIndex, setCurrIndex, nickname, setNickname, error } =
+    usePlayerContext()
 
   const handleClickArrowLeft = () => {
     if (currIndex > 0) {

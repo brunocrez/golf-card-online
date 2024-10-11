@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
 import {
@@ -26,14 +26,7 @@ export function FindLobbyDialog({ open, setOpen }: FindLobbyDialogProps) {
   const { setLobby } = useGameContext()
   const { socket } = useSocketConnection()
 
-  const handleClick = () => {
-    if (!value.length || value.length !== 12) {
-      setError('o código da sala deve conter 12 caracteres!')
-      return
-    }
-
-    socket.emit('get-lobby', value)
-
+  useEffect(() => {
     socket.on('lobby-not-found', (message: string) => {
       setError(message)
     })
@@ -43,6 +36,20 @@ export function FindLobbyDialog({ open, setOpen }: FindLobbyDialogProps) {
       setLobby(lobby)
       navigate(`${Routes.MATCH_ROOM}/${value}`)
     })
+
+    return () => {
+      socket.off('lobby-not-found')
+      socket.off('lobby-details')
+    }
+  }, [socket, navigate, setError, setLobby, value])
+
+  const handleClick = () => {
+    if (!value.length || value.length !== 12) {
+      setError('o código da sala deve conter 12 caracteres!')
+      return
+    }
+
+    socket.emit('get-lobby', value)
   }
 
   return (

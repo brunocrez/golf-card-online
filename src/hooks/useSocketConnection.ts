@@ -1,9 +1,16 @@
-import { io } from 'socket.io-client'
+import { useState } from 'react'
+import { io, Socket } from 'socket.io-client'
 
-const baseURL = import.meta.env.VITE_BASE_URL
+let socket: Socket
 
 export function useSocketConnection() {
-  const socket = io(baseURL, { reconnection: false })
+  const [socketInstance] = useState<Socket>(() => {
+    if (!socket) {
+      socket = io('http://localhost:8080', { reconnection: false })
+    }
 
-  return { socket }
+    return socket
+  })
+
+  return { socket: socketInstance }
 }
