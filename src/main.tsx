@@ -10,6 +10,7 @@ import { MatchRoom } from './pages/MatchRoom.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GameContextProvider } from './contexts/GameContext.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
+import { Game } from './pages/Game.tsx'
 
 const client = new QueryClient()
 
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
   {
     path: '/match-room/:lobbyId',
     element: <MatchRoom />,
+  },
+  {
+    path: '/game/:lobbyId',
+    element: <Game />,
   },
   {
     path: '*',

@@ -32,10 +32,19 @@ export function LobbyPage() {
 
     socket.on('updated-lobby', handleUpdatedLobby)
 
+    socket.on('game-started', (data) => {
+      console.log(socket.id)
+      console.log(data)
+    })
+
     return () => {
       socket.off('updated-lobby', handleUpdatedLobby)
     }
   }, [lobbyId, navigate, socket, lobby, setLobby])
+
+  function handleClickStartGame() {
+    socket.emit('start-game', lobby?.id)
+  }
 
   return (
     <>
@@ -80,6 +89,7 @@ export function LobbyPage() {
                 key={player.playerId}
                 image={player.image}
                 nickname={player.nickname}
+                kickPlayer
               />
             ))}
           </div>
@@ -88,7 +98,10 @@ export function LobbyPage() {
             <Button className="bg-purple-600 hover:bg-green-400 text-white font-bold text-xl p-7">
               regras básicas
             </Button>
-            <Button className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl p-7">
+            <Button
+              className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl p-7"
+              onClick={handleClickStartGame}
+            >
               iniciar jogo
             </Button>
           </div>

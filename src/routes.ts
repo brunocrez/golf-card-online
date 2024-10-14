@@ -3,4 +3,5 @@ export const Routes = {
   PRE_LOBBY: '/pre-lobby',
   LOBBY: '/lobby',
   MATCH_ROOM: '/match-room',
+  GAME: '/game',
 }

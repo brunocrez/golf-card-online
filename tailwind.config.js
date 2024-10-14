@@ -57,4 +57,5 @@ export default {
   	}
   },
   plugins: [require("tailwindcss-animate")],
+	safelist: ['w-24', 'h-24']
 }
