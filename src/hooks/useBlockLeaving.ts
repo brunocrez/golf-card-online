@@ -1,12 +1,16 @@
 import { useCallback } from 'react'
 import { BlockerFunction, useBeforeUnload, useBlocker } from 'react-router-dom'
 
-export function useBlockLeaving() {
+export function useBlockLeaving(lobbyId: string) {
+  const allowedPath = `/game/${lobbyId}`
   const shouldBlock = useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
-      return currentLocation.pathname !== nextLocation.pathname
+      return (
+        currentLocation.pathname !== nextLocation.pathname &&
+        nextLocation.pathname !== allowedPath
+      )
     },
-    [],
+    [allowedPath],
   )
 
   useBeforeUnload((e: BeforeUnloadEvent) => {

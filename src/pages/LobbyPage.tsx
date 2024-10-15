@@ -9,14 +9,14 @@ import { Routes } from '@/routes'
 import { useBlockLeaving } from '@/hooks/useBlockLeaving'
 import { LeavingDialog } from '@/components/LeavingDialog'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
-import { GetLobbyResponse } from '@/models/Lobby'
+import { CreateLobbyResponse, GetLobbyResponse } from '@/models/Lobby'
 
 export function LobbyPage() {
   const navigate = useNavigate()
   const { lobbyId } = useParams<{ lobbyId: string }>()
   const { lobby, setLobby } = useGameContext()
   const { socket } = useSocketConnection()
-  const { state, proceed, reset } = useBlockLeaving()
+  const { state, proceed, reset } = useBlockLeaving(lobbyId ?? '')
   const res = filterPlayer(lobby)
 
   const [, setOpen] = useState(false)
@@ -32,9 +32,9 @@ export function LobbyPage() {
 
     socket.on('updated-lobby', handleUpdatedLobby)
 
-    socket.on('game-started', (data) => {
-      console.log(socket.id)
-      console.log(data)
+    socket.on('game-started', (data: CreateLobbyResponse) => {
+      setLobby(data)
+      navigate(`${Routes.GAME}/${data.id}`)
     })
 
     return () => {

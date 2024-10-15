@@ -1,5 +1,5 @@
 import { CreateLobbyResponse } from '@/models/Lobby'
-import { IPlayer } from '@/models/Player'
+import { Player } from '@/models/Player'
 
 export function filterPlayer(data: CreateLobbyResponse | undefined) {
   if (!data) {
@@ -8,7 +8,7 @@ export function filterPlayer(data: CreateLobbyResponse | undefined) {
 
   const { host, players } = data
 
-  const hostPlayer = players.find((player: IPlayer) => player.playerId === host)
+  const hostPlayer = players.find((player: Player) => player.playerId === host)
   const regularPlayers = players.filter((player) => player.playerId !== host)
 
   return { hostPlayer, regularPlayers }
