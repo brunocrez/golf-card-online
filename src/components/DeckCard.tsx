@@ -1,32 +1,42 @@
+import { useEffect, useState } from 'react'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
-import { useEffect, useState } from 'react'
+import { Card } from '@/models/Card'
 
-interface DeckCardProps {
-  image: string
-  alt: string
-  faceUp: boolean
-  code: string
+type DeckCardProps = {
+  card: Card
   isCurrentPlayer: boolean
 }
 
-export function DeckCard({
-  image,
-  alt,
-  faceUp,
-  code,
-  isCurrentPlayer,
-}: DeckCardProps) {
+export function DeckCard({ card, isCurrentPlayer }: DeckCardProps) {
+  const { faceUp, code, images } = card
   const { socket } = useSocketConnection()
-  const { lobby } = useGameContext()
+  const { lobby, isReplaceMode, suspendedCard } = useGameContext()
+
   const [isFaceDown, setIsFaceDown] = useState(!faceUp)
 
-  const handleFlip = () => {
-    if (!isFaceDown || !isCurrentPlayer) {
+  const handleClick = () => {
+    if (isReplaceMode) {
+      if (
+        !isCurrentPlayer ||
+        !suspendedCard ||
+        lobby?.currentTurn !== socket.id
+      ) {
+        return
+      }
+
+      const payload = {
+        drawnCard: suspendedCard,
+        cardToReplace: card,
+        playerId: socket.id,
+        lobbyId: lobby?.id ?? '',
+      }
+
+      socket.emit('draw-card-from-pile', payload)
       return
     }
 
-    if (lobby?.currentTurn !== socket.id) {
+    if (!isFaceDown || !isCurrentPlayer || lobby?.currentTurn !== socket.id) {
       return
     }
 
@@ -44,13 +54,15 @@ export function DeckCard({
     setIsFaceDown(!faceUp)
   }, [faceUp])
 
-  const cardClasses = `card hover:cursor-pointer ${isFaceDown ? 'flipped' : ''}`
+  const cardClasses = `card hover:cursor-pointer ${
+    isFaceDown ? 'flipped' : ''
+  } ${isReplaceMode && isCurrentPlayer ? 'highlight-aura' : ''} `
 
   return (
-    <div className="card-container" onClick={handleFlip}>
+    <div className="card-container" onClick={handleClick}>
       <div className={cardClasses}>
         <div className="card-front">
-          <img className="w-full h-full" src={image} alt={alt} />
+          <img className="w-full h-full" src={images.png} alt={code} />
         </div>
         <div className="card-back"></div>
       </div>

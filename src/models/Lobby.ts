@@ -20,7 +20,7 @@ export interface CreateLobbyResponse {
   players: Player[]
   rounds: number
   deck: Deck | undefined
-  discardPile: Card[] | undefined
+  discardPile: Card[]
   currentTurn: string | undefined
   isFirstTurn: boolean
   isLastTurn: boolean

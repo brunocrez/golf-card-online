@@ -83,6 +83,12 @@ body {
 
 .card-container {
   perspective: 1000px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-container:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px 4px rgba(0, 0, 0, 0.2);
 }
 
 .card {
@@ -115,4 +121,17 @@ body {
 
 .image-back-card {
   background-image: url('https://www.deckofcardsapi.com/static/img/back.png');
+}
+
+.highlight-aura {
+  box-shadow: 0 0 10px 4px yellow;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.transform {
+  transition: transform 0.3s ease;
 }

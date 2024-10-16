@@ -12,10 +12,7 @@ export function PlayerBoard({ cards, isCurrentPlayer }: PlayerBoardProps) {
       {cards.map((card) => (
         <DeckCard
           key={card.code}
-          code={card.code}
-          image={card.images.png}
-          alt={card.code}
-          faceUp={card.faceUp}
+          card={card}
           isCurrentPlayer={isCurrentPlayer}
         />
       ))}
