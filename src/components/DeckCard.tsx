@@ -11,7 +11,7 @@ type DeckCardProps = {
 export function DeckCard({ card, isCurrentPlayer }: DeckCardProps) {
   const { faceUp, code, images } = card
   const { socket } = useSocketConnection()
-  const { lobby, isReplaceMode, suspendedCard } = useGameContext()
+  const { lobby, isReplaceMode, suspendedCard, isLoading } = useGameContext()
 
   const [isFaceDown, setIsFaceDown] = useState(!faceUp)
 
@@ -32,11 +32,16 @@ export function DeckCard({ card, isCurrentPlayer }: DeckCardProps) {
         lobbyId: lobby?.id ?? '',
       }
 
-      socket.emit('draw-card-from-pile', payload)
+      socket.emit('replace-card', payload)
       return
     }
 
-    if (!isFaceDown || !isCurrentPlayer || lobby?.currentTurn !== socket.id) {
+    if (
+      !isFaceDown ||
+      !isCurrentPlayer ||
+      lobby?.currentTurn !== socket.id ||
+      isLoading
+    ) {
       return
     }
 

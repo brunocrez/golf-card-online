@@ -10,3 +10,9 @@ export interface Card {
   suit: string
   faceUp: boolean
 }
+
+export interface DrawCardResponse {
+  success: boolean
+  card: Card | undefined
+  message: string | undefined
+}

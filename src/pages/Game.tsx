@@ -1,22 +1,35 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { LobbyPlayer } from '@/components/LobbyPlayer'
 import { PlayerBoard } from '@/components/PlayerBoard'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
 import { getCurrentPlayer } from '@/utils/getCurrentPlayer'
-import { Card } from '@/models/Card'
+import { Card, DrawCardResponse } from '@/models/Card'
+import { DrawDiscardPile } from '@/components/DrawDiscardPile'
+import { DrawDeck } from '@/components/DrawDeck'
 
 export function Game() {
   const { socket } = useSocketConnection()
-  const { lobby, setLobby, isReplaceMode, setIsReplaceMode, setSuspendedCard } =
-    useGameContext()
+  const {
+    lobby,
+    setLobby,
+    isReplaceMode,
+    setIsReplaceMode,
+    setSuspendedCard,
+    suspendedCard,
+    setIsLoading,
+    isLoading,
+  } = useGameContext()
   const { currPlayer, enemy } = getCurrentPlayer(socket, lobby?.players ?? [])
+
+  const [drewFromDeck, setDrewFromDeck] = useState(false)
 
   useEffect(() => {
     socket.on('updated-game', (data) => {
       setLobby(data)
       setIsReplaceMode(false)
       setSuspendedCard(undefined)
+      setDrewFromDeck(false)
     })
 
     return () => {
@@ -25,17 +38,54 @@ export function Game() {
   }, [socket, setLobby, setIsReplaceMode, setSuspendedCard])
 
   function handleClickPile(card: Card | undefined) {
+    // player drawn a card and will discard it
+    if (drewFromDeck) {
+      const payload = {
+        card: suspendedCard,
+        playerId: socket.id,
+        lobbyId: lobby?.id ?? '',
+      }
+
+      socket.emit('discard-card', payload)
+      return
+    }
+
     setIsReplaceMode(true)
     setSuspendedCard(card)
   }
 
   function exitReplaceMode() {
+    // block player to leave replace mode if he's drawing a card from deck
+    if (suspendedCard && drewFromDeck) {
+      return
+    }
+
     setIsReplaceMode(false)
     setSuspendedCard(undefined)
   }
 
-  const lastCardFromPile =
-    lobby && lobby.discardPile[lobby.discardPile.length - 1]
+  function handleClickDeck() {
+    if (lobby?.currentTurn !== socket.id) {
+      return
+    }
+
+    setIsLoading(true)
+    socket.emit(
+      'draw-card-from-deck',
+      lobby?.id,
+      (response: DrawCardResponse) => {
+        setIsLoading(false)
+
+        if (response.success) {
+          setIsReplaceMode(true)
+          setSuspendedCard(response.card)
+          setDrewFromDeck(true)
+        } else {
+          console.error('falha ao comprar a carta:', response.message)
+        }
+      },
+    )
+  }
 
   return (
     <div
@@ -59,15 +109,21 @@ export function Game() {
         <PlayerBoard cards={enemy.cards ?? []} isCurrentPlayer={false} />
 
         <div className="flex justify-center gap-4">
-          <div
-            className={`w-[95px] h-[132px] hover:cursor-pointer ${
-              isReplaceMode ? 'transform scale-110 shadow-lg' : ''
-            }`}
-            onClick={() => handleClickPile(lastCardFromPile)}
-          >
-            <img className="w-full h-full" src={lastCardFromPile?.images.png} />
-          </div>
-          <div className="image-back-card w-[95px] h-[132px] bg-no-repeat bg-contain bg-center"></div>
+          {/* Pilha de descarte */}
+          <DrawDiscardPile
+            lobby={lobby}
+            drewFromDeck={drewFromDeck}
+            isReplaceMode={isReplaceMode}
+            onClick={handleClickPile}
+          />
+
+          {/* Deck */}
+          <DrawDeck
+            drewFromDeck={drewFromDeck}
+            isLoading={isLoading}
+            onClick={handleClickDeck}
+            suspendedCard={suspendedCard}
+          />
         </div>
 
         <PlayerBoard cards={currPlayer.cards ?? []} isCurrentPlayer={true} />

@@ -27,7 +27,7 @@ export function LobbyPage() {
     }
 
     const handleUpdatedLobby = (data: GetLobbyResponse) => {
-      setLobby({ ...data })
+      setLobby(data)
     }
 
     socket.on('updated-lobby', handleUpdatedLobby)
@@ -98,12 +98,14 @@ export function LobbyPage() {
             <Button className="bg-purple-600 hover:bg-green-400 text-white font-bold text-xl p-7">
               regras básicas
             </Button>
-            <Button
-              className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl p-7"
-              onClick={handleClickStartGame}
-            >
-              iniciar jogo
-            </Button>
+            {socket.id === lobby?.host && (
+              <Button
+                className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl p-7"
+                onClick={handleClickStartGame}
+              >
+                iniciar jogo
+              </Button>
+            )}
           </div>
         </div>
 

@@ -17,6 +17,8 @@ interface GameContextProps {
   setCardToBeReplaced: Dispatch<SetStateAction<Card | undefined>>
   suspendedCard: Card | undefined
   setSuspendedCard: Dispatch<SetStateAction<Card | undefined>>
+  isLoading: boolean
+  setIsLoading: Dispatch<SetStateAction<boolean>>
 }
 
 export const GameContext = createContext<GameContextProps>(
@@ -30,6 +32,7 @@ interface GameContextProviderProps {
 export function GameContextProvider({ children }: GameContextProviderProps) {
   const [lobby, setLobby] = useState<CreateLobbyResponse | undefined>(undefined)
   const [isReplaceMode, setIsReplaceMode] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [suspendedCard, setSuspendedCard] = useState<Card | undefined>(
     undefined,
   )
@@ -48,6 +51,8 @@ export function GameContextProvider({ children }: GameContextProviderProps) {
         setCardToBeReplaced,
         suspendedCard,
         setSuspendedCard,
+        isLoading,
+        setIsLoading,
       }}
     >
       {children}
