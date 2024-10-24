@@ -59,13 +59,23 @@ export function DeckCard({ card, isCurrentPlayer }: DeckCardProps) {
     setIsFaceDown(!faceUp)
   }, [faceUp])
 
-  const cardClasses = `card hover:cursor-pointer ${
-    isFaceDown ? 'flipped' : ''
-  } ${isReplaceMode && isCurrentPlayer ? 'highlight-aura' : ''} `
+  const cardClasses = () => {
+    let st = 'card w-[80px] h-[110px] sm:w-[95px] sm:h-[132px] '
+
+    if (isFaceDown) {
+      st += 'flipped '
+    }
+
+    if (isReplaceMode && isCurrentPlayer) {
+      st += 'highlight-aura'
+    }
+
+    return st
+  }
 
   return (
     <div className="card-container" onClick={handleClick}>
-      <div className={cardClasses}>
+      <div className={cardClasses()}>
         <div className="card-front">
           <img className="w-full h-full" src={images.png} alt={code} />
         </div>

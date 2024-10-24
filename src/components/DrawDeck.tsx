@@ -16,7 +16,7 @@ export function DrawDeck({
 }: DrawDeckProps) {
   return (
     <div
-      className="w-[95px] h-[132px] relative hover:cursor-pointer"
+      className="w-[80px] h-[110px] sm:w-[95px] sm:h-[132px] relative hover:cursor-pointer"
       onClick={onClick}
     >
       {isLoading ? (

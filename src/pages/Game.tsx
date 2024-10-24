@@ -7,6 +7,7 @@ import { getCurrentPlayer } from '@/utils/getCurrentPlayer'
 import { Card, DrawCardResponse } from '@/models/Card'
 import { DrawDiscardPile } from '@/components/DrawDiscardPile'
 import { DrawDeck } from '@/components/DrawDeck'
+import { ScoreBoard } from '@/components/ScoreBoard'
 
 export function Game() {
   const { socket } = useSocketConnection()
@@ -88,52 +89,55 @@ export function Game() {
   }
 
   return (
-    <div
-      className="h-screen flex justify-center items-center px-2"
-      onClick={exitReplaceMode}
-    >
-      {isReplaceMode && (
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 opacity-50 z-10" />
-      )}
-
+    <>
+      <ScoreBoard lobby={lobby} />
       <div
-        className="flex flex-col gap-4 relative z-20"
-        onClick={(e) => e.stopPropagation()}
+        className="w-full h-full py-4 flex justify-center items-center px-2"
+        onClick={exitReplaceMode}
       >
-        <LobbyPlayer
-          nickname={enemy.nickname}
-          image={enemy.image}
-          width={10}
-          height={10}
-        />
-        <PlayerBoard cards={enemy.cards ?? []} isCurrentPlayer={false} />
+        {isReplaceMode && (
+          <div className="fixed top-0 left-0 w-full h-full bg-gray-800 opacity-50 z-10" />
+        )}
 
-        <div className="flex justify-center gap-4">
-          {/* Pilha de descarte */}
-          <DrawDiscardPile
-            lobby={lobby}
-            drewFromDeck={drewFromDeck}
-            isReplaceMode={isReplaceMode}
-            onClick={handleClickPile}
+        <div
+          className="flex flex-col gap-4 relative z-20"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <LobbyPlayer
+            nickname={enemy.nickname}
+            image={enemy.image}
+            width={10}
+            height={10}
           />
+          <PlayerBoard cards={enemy.cards ?? []} isCurrentPlayer={false} />
 
-          {/* Deck */}
-          <DrawDeck
-            drewFromDeck={drewFromDeck}
-            isLoading={isLoading}
-            onClick={handleClickDeck}
-            suspendedCard={suspendedCard}
+          <div className="flex justify-center gap-4">
+            {/* Pilha de descarte */}
+            <DrawDiscardPile
+              lobby={lobby}
+              drewFromDeck={drewFromDeck}
+              isReplaceMode={isReplaceMode}
+              onClick={handleClickPile}
+            />
+
+            {/* Deck */}
+            <DrawDeck
+              drewFromDeck={drewFromDeck}
+              isLoading={isLoading}
+              onClick={handleClickDeck}
+              suspendedCard={suspendedCard}
+            />
+          </div>
+
+          <PlayerBoard cards={currPlayer.cards ?? []} isCurrentPlayer={true} />
+          <LobbyPlayer
+            nickname={currPlayer.nickname}
+            image={currPlayer.image}
+            width={10}
+            height={10}
           />
         </div>
-
-        <PlayerBoard cards={currPlayer.cards ?? []} isCurrentPlayer={true} />
-        <LobbyPlayer
-          nickname={currPlayer.nickname}
-          image={currPlayer.image}
-          width={10}
-          height={10}
-        />
       </div>
-    </div>
+    </>
   )
 }
