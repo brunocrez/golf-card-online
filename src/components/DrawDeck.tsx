@@ -22,7 +22,7 @@ export function DrawDeck({
       {isLoading ? (
         <Spinner />
       ) : suspendedCard && drewFromDeck ? (
-        <div className="card">
+        <div className="card w-[80px] h-[110px] sm:w-[95px] sm:h-[132px]">
           <div className="card-front">
             <img
               className="w-full h-full"
