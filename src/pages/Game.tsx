@@ -9,6 +9,8 @@ import { DrawDiscardPile } from '@/components/DrawDiscardPile'
 import { DrawDeck } from '@/components/DrawDeck'
 import { ScoreBoard } from '@/components/ScoreBoard'
 import { ColumnScore } from '@/components/ColumnScore'
+import { useBlockLeaving } from '@/hooks/useBlockLeaving'
+import { LeavingDialog } from '@/components/LeavingDialog'
 
 export function Game() {
   const { socket } = useSocketConnection()
@@ -22,9 +24,11 @@ export function Game() {
     setIsLoading,
     isLoading,
   } = useGameContext()
+  const { proceed, reset, state } = useBlockLeaving(lobby?.id ?? '')
   const { currPlayer, enemy } = getCurrentPlayer(socket, lobby?.players ?? [])
 
   const [drewFromDeck, setDrewFromDeck] = useState(false)
+  const [, setOpen] = useState(false)
 
   useEffect(() => {
     socket.on('updated-game', (data) => {
@@ -91,6 +95,13 @@ export function Game() {
 
   return (
     <>
+      <LeavingDialog
+        open={state === 'blocked'}
+        proceed={proceed}
+        setOpen={setOpen}
+        reset={reset}
+      />
+
       <ScoreBoard lobby={lobby} />
       <div
         className="w-full h-full py-4 flex justify-center items-center px-2"
