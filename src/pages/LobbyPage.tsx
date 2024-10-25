@@ -39,6 +39,7 @@ export function LobbyPage() {
 
     return () => {
       socket.off('updated-lobby', handleUpdatedLobby)
+      socket.off('game-started')
     }
   }, [lobbyId, navigate, socket, lobby, setLobby])
 

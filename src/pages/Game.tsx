@@ -8,6 +8,7 @@ import { Card, DrawCardResponse } from '@/models/Card'
 import { DrawDiscardPile } from '@/components/DrawDiscardPile'
 import { DrawDeck } from '@/components/DrawDeck'
 import { ScoreBoard } from '@/components/ScoreBoard'
+import { ColumnScore } from '@/components/ColumnScore'
 
 export function Game() {
   const { socket } = useSocketConnection()
@@ -109,6 +110,7 @@ export function Game() {
             width={10}
             height={10}
           />
+          <ColumnScore scoreArray={enemy.score} />
           <PlayerBoard cards={enemy.cards ?? []} isCurrentPlayer={false} />
 
           <div className="flex justify-center gap-4">
@@ -130,6 +132,7 @@ export function Game() {
           </div>
 
           <PlayerBoard cards={currPlayer.cards ?? []} isCurrentPlayer={true} />
+          <ColumnScore scoreArray={currPlayer.score} />
           <LobbyPlayer
             nickname={currPlayer.nickname}
             image={currPlayer.image}
