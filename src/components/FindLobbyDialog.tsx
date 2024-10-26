@@ -54,7 +54,7 @@ export function FindLobbyDialog({ open, setOpen }: FindLobbyDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-[320px] rounded-md sm:max-w-md">
         <DialogHeader>
           <DialogTitle>buscar salas disponíveis</DialogTitle>
         </DialogHeader>

@@ -44,7 +44,7 @@ export function Game() {
   }, [socket, setLobby, setIsReplaceMode, setSuspendedCard])
 
   function handleClickPile(card: Card | undefined) {
-    // player drawn a card and will discard it
+    // player drew a card and will discard it
     if (drewFromDeck) {
       const payload = {
         card: suspendedCard,
@@ -71,7 +71,8 @@ export function Game() {
   }
 
   function handleClickDeck() {
-    if (lobby?.currentTurn !== socket.id) {
+    // prevent player to draw a card if it's not his turn OR if he already drew one
+    if (lobby?.currentTurn !== socket.id || isReplaceMode) {
       return
     }
 
