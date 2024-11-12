@@ -38,8 +38,25 @@ export function Game() {
       setDrewFromDeck(false)
     })
 
+    socket.on('finish-round', (data) => {
+      // set spinner to calculate scores
+      console.log(data)
+    })
+
+    socket.on('proceed-to-next-round', (data) => {
+      setLobby(data)
+    })
+
+    socket.on('end-game', () => {
+      // navigate to podium screen
+      console.log('endgame!')
+    })
+
     return () => {
       socket.off('updated-game')
+      socket.off('proceed-to-next-round')
+      socket.off('finish-round')
+      socket.off('end-game')
     }
   }, [socket, setLobby, setIsReplaceMode, setSuspendedCard])
 

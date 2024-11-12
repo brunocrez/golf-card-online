@@ -11,6 +11,13 @@ interface Deck {
   deck_id: string
   remaining: number
 }
+
+interface ScoreBoard {
+  nickname: string
+  score: number
+  playerId: string
+}
+
 export interface CreateLobbyResponse {
   id: string
   host: string
@@ -19,18 +26,14 @@ export interface CreateLobbyResponse {
   currentPlayers: number
   players: Player[]
   rounds: number
+  currentRound: number
+  scoreBoard: ScoreBoard[] | undefined
   deck: Deck | undefined
   discardPile: Card[]
   currentTurn: string | undefined
-  isFirstTurn: boolean
-  isLastTurn: boolean
   playerStartedLastTurn: string | undefined
-  createdAt: Date
-  updatedAt: Date
 }
 
 export type GetLobbyResponse = CreateLobbyResponse
-
-export type JoinLobbyRequest = CreateLobbyRequest
 
 export type JoinLobbyResponse = CreateLobbyResponse

@@ -37,7 +37,7 @@ export function ScoreBoard({ lobby }: ScoreBoardProps) {
         </div>
       </div>
 
-      {lobby?.players.map((p, idx) => (
+      {lobby?.scoreBoard?.map((p, idx) => (
         <div
           key={p.playerId}
           className="flex flex-col justify-center items-center"
@@ -49,7 +49,7 @@ export function ScoreBoard({ lobby }: ScoreBoardProps) {
             {idx < 3 && <Trophy className={trophyColors[idx]} size={18} />}
           </div>
           <p className="text-white font-bold">{p.nickname}</p>
-          <p className="font-bold text-white">0</p>
+          <p className="font-bold text-white">{p.score}</p>
         </div>
       ))}
     </div>
