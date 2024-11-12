@@ -12,8 +12,8 @@ interface LobbyPlayerProps {
 export function LobbyPlayer({
   image,
   nickname,
-  width = 24,
-  height = 24,
+  width = 20,
+  height = 20,
   kickPlayer = false,
 }: LobbyPlayerProps) {
   return (

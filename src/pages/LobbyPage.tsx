@@ -21,6 +21,8 @@ export function LobbyPage() {
 
   const [, setOpen] = useState(false)
 
+  const canStartGame = (lobby?.players && lobby.players.length > 1) || 0
+
   useEffect(() => {
     if (!lobby || !lobbyId) {
       return navigate(Routes.PRE_LOBBY)
@@ -73,36 +75,42 @@ export function LobbyPage() {
             <img
               src={res?.hostPlayer?.image}
               alt="avatar"
-              className="w-36 h-36"
+              className="w-24 h-24"
             />
             <div className="flex flex-col gap-2">
               <p>{res?.hostPlayer?.nickname}</p>
-              <p>0 pontos</p>
               <div className="bg-indigo-500 text-white p-1 text-center rounded-md w-full max-w-28">
                 host
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-5">
-            {res?.regularPlayers?.map((player) => (
-              <LobbyPlayer
-                key={player.playerId}
-                image={player.image}
-                nickname={player.nickname}
-                kickPlayer
-              />
-            ))}
-          </div>
+          {canStartGame ? (
+            <div className="flex flex-wrap gap-5">
+              {res?.regularPlayers?.map((player) => (
+                <LobbyPlayer
+                  key={player.playerId}
+                  image={player.image}
+                  nickname={player.nickname}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-lg text-gray-600">
+              <span>aguardando jogadores </span>
+              <span className="dot ml-1"></span>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3">
-            <Button className="bg-purple-600 hover:bg-green-400 text-white font-bold text-xl p-7">
+            <Button className="bg-purple-600 hover:bg-purple-400 text-white font-bold text-lg p-2 md:p-6 md:text-xl">
               regras básicas
             </Button>
             {socket.id === lobby?.host && (
               <Button
-                className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl p-7"
+                className="bg-green-500 hover:bg-green-400 text-white font-bold text-lg p-2 md:p-6 md:text-xl"
                 onClick={handleClickStartGame}
+                disabled={!canStartGame}
               >
                 iniciar jogo
               </Button>
