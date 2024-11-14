@@ -11,6 +11,7 @@ import { ScoreBoard } from '@/components/ScoreBoard'
 import { ColumnScore } from '@/components/ColumnScore'
 import { useBlockLeaving } from '@/hooks/useBlockLeaving'
 import { LeavingDialog } from '@/components/LeavingDialog'
+import { CalculateScore } from '@/components/CalculateScore'
 
 export function Game() {
   const { socket } = useSocketConnection()
@@ -28,6 +29,7 @@ export function Game() {
   const { currPlayer, enemy } = getCurrentPlayer(socket, lobby?.players ?? [])
 
   const [drewFromDeck, setDrewFromDeck] = useState(false)
+  const [showCalculateScore, setShowCalculateScore] = useState(false)
   const [, setOpen] = useState(false)
 
   useEffect(() => {
@@ -38,12 +40,12 @@ export function Game() {
       setDrewFromDeck(false)
     })
 
-    socket.on('finish-round', (data) => {
-      // set spinner to calculate scores
-      console.log(data)
+    socket.on('finish-round', () => {
+      setShowCalculateScore(true)
     })
 
     socket.on('proceed-to-next-round', (data) => {
+      setShowCalculateScore(false)
       setLobby(data)
     })
 
@@ -119,6 +121,8 @@ export function Game() {
         setOpen={setOpen}
         reset={reset}
       />
+
+      {showCalculateScore && <CalculateScore />}
 
       <ScoreBoard lobby={lobby} />
       <div
