@@ -1,5 +1,6 @@
 import { Card } from '@/models/Card'
 import { CreateLobbyResponse } from '@/models/Lobby'
+import { cardSize } from '@/utils/cardSize'
 
 interface DrawDiscardPileProps {
   lobby: CreateLobbyResponse | undefined
@@ -18,8 +19,7 @@ export function DrawDiscardPile({
     lobby && lobby.discardPile[lobby.discardPile.length - 1]
 
   const setStyle = () => {
-    let style =
-      'w-[80px] h-[110px] sm:w-[95px] sm:h-[132px] hover:cursor-pointer '
+    let style = `${cardSize} hover:cursor-pointer `
 
     if (isReplaceMode && !drewFromDeck) {
       style += 'transform scale-110 shadow-lg'

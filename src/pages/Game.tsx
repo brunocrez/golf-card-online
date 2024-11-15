@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { LobbyPlayer } from '@/components/LobbyPlayer'
 import { PlayerBoard } from '@/components/PlayerBoard'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
@@ -7,8 +6,6 @@ import { getCurrentPlayer } from '@/utils/getCurrentPlayer'
 import { Card, DrawCardResponse } from '@/models/Card'
 import { DrawDiscardPile } from '@/components/DrawDiscardPile'
 import { DrawDeck } from '@/components/DrawDeck'
-import { ScoreBoard } from '@/components/ScoreBoard'
-import { ColumnScore } from '@/components/ColumnScore'
 import { useBlockLeaving } from '@/hooks/useBlockLeaving'
 import { LeavingDialog } from '@/components/LeavingDialog'
 import { CalculateScore } from '@/components/CalculateScore'
@@ -114,7 +111,7 @@ export function Game() {
   }
 
   return (
-    <>
+    <div className="relative w-full h-screen flex flex-col justify-center items-center">
       <LeavingDialog
         open={state === 'blocked'}
         proceed={proceed}
@@ -124,56 +121,66 @@ export function Game() {
 
       {showCalculateScore && <CalculateScore />}
 
-      <ScoreBoard lobby={lobby} />
-      <div
-        className="w-full h-full py-4 flex justify-center items-center px-2"
-        onClick={exitReplaceMode}
-      >
-        {isReplaceMode && (
-          <div className="fixed top-0 left-0 w-full h-full bg-gray-800 opacity-50 z-10" />
-        )}
+      {/* Cabeçalho fixo do jogador inimigo */}
+      <div className="fixed top-0 left-0 w-full flex justify-center items-center gap-4 bg-slate-500 p-3">
+        <img src={enemy.image} className="w-8 h-8" alt="avatar" />
+        <p className="text-white font-bold text-sm">{enemy.nickname}</p>
+      </div>
 
+      {/* Container principal */}
+      <div className="flex-grow flex items-center justify-center w-full max-w-md">
         <div
-          className="flex flex-col gap-4 relative z-20"
-          onClick={(e) => e.stopPropagation()}
+          className="w-full h-full py-4 flex flex-col justify-center items-center px-2 relative"
+          onClick={exitReplaceMode}
         >
-          <LobbyPlayer
-            nickname={enemy.nickname}
-            image={enemy.image}
-            width={10}
-            height={10}
-          />
-          <ColumnScore scoreArray={enemy.score} />
-          <PlayerBoard cards={enemy.cards ?? []} isCurrentPlayer={false} />
+          {isReplaceMode && (
+            <div className="fixed top-0 left-0 w-full h-full bg-gray-800 opacity-50 z-10" />
+          )}
 
-          <div className="flex justify-center gap-4">
-            {/* Pilha de descarte */}
-            <DrawDiscardPile
-              lobby={lobby}
-              drewFromDeck={drewFromDeck}
-              isReplaceMode={isReplaceMode}
-              onClick={handleClickPile}
+          <div
+            className="flex flex-col gap-4 z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <PlayerBoard
+              cards={enemy.cards ?? []}
+              isCurrentPlayer={false}
+              scoreArray={enemy.score}
+              scorePosition="top"
             />
 
-            {/* Deck */}
-            <DrawDeck
-              drewFromDeck={drewFromDeck}
-              isLoading={isLoading}
-              onClick={handleClickDeck}
-              suspendedCard={suspendedCard}
+            <div className="flex justify-center gap-4">
+              {/* Pilha de descarte */}
+              <DrawDiscardPile
+                lobby={lobby}
+                drewFromDeck={drewFromDeck}
+                isReplaceMode={isReplaceMode}
+                onClick={handleClickPile}
+              />
+
+              {/* Deck */}
+              <DrawDeck
+                drewFromDeck={drewFromDeck}
+                isLoading={isLoading}
+                onClick={handleClickDeck}
+                suspendedCard={suspendedCard}
+              />
+            </div>
+
+            <PlayerBoard
+              cards={currPlayer.cards ?? []}
+              isCurrentPlayer={true}
+              scoreArray={currPlayer.score}
+              scorePosition="bottom"
             />
           </div>
-
-          <PlayerBoard cards={currPlayer.cards ?? []} isCurrentPlayer={true} />
-          <ColumnScore scoreArray={currPlayer.score} />
-          <LobbyPlayer
-            nickname={currPlayer.nickname}
-            image={currPlayer.image}
-            width={10}
-            height={10}
-          />
         </div>
       </div>
-    </>
+
+      {/* Rodapé fixo do jogador atual */}
+      <div className="fixed bottom-0 left-0 w-full flex justify-center items-center gap-4 bg-slate-500 p-3">
+        <img src={currPlayer.image} className="w-8 h-8" alt="avatar" />
+        <p className="text-white font-bold text-sm">{currPlayer.nickname}</p>
+      </div>
+    </div>
   )
 }

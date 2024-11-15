@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
 import { Card } from '@/models/Card'
+import { cardSize } from '@/utils/cardSize'
 
 type DeckCardProps = {
   card: Card
@@ -60,7 +61,7 @@ export function DeckCard({ card, isCurrentPlayer }: DeckCardProps) {
   }, [faceUp])
 
   const cardClasses = () => {
-    let st = 'card w-[80px] h-[110px] sm:w-[95px] sm:h-[132px] '
+    let st = `card ${cardSize} `
 
     if (isFaceDown) {
       st += 'flipped '
