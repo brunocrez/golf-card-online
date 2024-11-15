@@ -29,6 +29,9 @@ export function Game() {
   const [showCalculateScore, setShowCalculateScore] = useState(false)
   const [, setOpen] = useState(false)
 
+  const isMyTurn = lobby?.currentTurn === socket.id
+  const isEnemyTurn = lobby?.currentTurn === enemy.playerId
+
   useEffect(() => {
     socket.on('updated-game', (data) => {
       setLobby(data)
@@ -122,7 +125,11 @@ export function Game() {
       {showCalculateScore && <CalculateScore />}
 
       {/* Cabeçalho fixo do jogador inimigo */}
-      <div className="fixed top-0 left-0 w-full flex justify-center items-center gap-4 bg-slate-500 p-3">
+      <div
+        className={`fixed top-0 left-0 w-full flex justify-center items-center gap-4 p-3 ${
+          isEnemyTurn ? 'animate-pulse-green' : 'bg-slate-500'
+        }`}
+      >
         <img src={enemy.image} className="w-8 h-8" alt="avatar" />
         <p className="text-white font-bold text-sm">{enemy.nickname}</p>
       </div>
@@ -177,7 +184,11 @@ export function Game() {
       </div>
 
       {/* Rodapé fixo do jogador atual */}
-      <div className="fixed bottom-0 left-0 w-full flex justify-center items-center gap-4 bg-slate-500 p-3">
+      <div
+        className={`fixed bottom-0 left-0 w-full flex justify-center items-center gap-4 p-3 ${
+          isMyTurn ? 'animate-pulse-green' : 'bg-slate-500'
+        }`}
+      >
         <img src={currPlayer.image} className="w-8 h-8" alt="avatar" />
         <p className="text-white font-bold text-sm">{currPlayer.nickname}</p>
       </div>

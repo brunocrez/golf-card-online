@@ -12,6 +12,16 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+			keyframes: {
+				pulseGreen: {
+					'0%': { backgroundColor: '#d4f5e1' },
+          '50%': { backgroundColor: '#28a745' },
+          '100%': { backgroundColor: '#d4f5e1' },
+				}
+			},
+			animation: {
+				'pulse-green': 'pulseGreen 2s infinite'
+			},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
