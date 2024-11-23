@@ -1,6 +1,7 @@
-import { GetLobbyResponse } from '@/models/Lobby'
 import { Trophy } from 'lucide-react'
+import { GetLobbyResponse } from '@/models/Lobby'
 import { LobbyPlayer } from './LobbyPlayer'
+import { trophyColors } from '@/utils/trophyColors'
 
 interface ScoreBoardProps {
   lobby: GetLobbyResponse | undefined
@@ -9,8 +10,6 @@ interface ScoreBoardProps {
 export function ScoreBoard({ lobby }: ScoreBoardProps) {
   const currTurn = lobby?.currentTurn
   const currPlayer = lobby?.players.find((p) => p.playerId === currTurn)
-
-  const trophyColors = ['text-yellow-400', 'text-gray-800', 'text-yellow-800']
 
   return (
     <div className="w-full bg-slate-400 py-4 px-6 flex gap-8 overflow-x-auto">

@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { GameContextProvider } from './contexts/GameContext.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
 import { Game } from './pages/Game.tsx'
+import { AwardPage } from './pages/AwardPage.tsx'
 
 const client = new QueryClient()
 
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
   {
     path: '/game/:lobbyId',
     element: <Game />,
+  },
+  {
+    path: '/award',
+    element: <AwardPage />,
   },
   {
     path: '*',

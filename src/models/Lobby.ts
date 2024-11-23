@@ -16,6 +16,7 @@ interface ScoreBoard {
   nickname: string
   score: number
   playerId: string
+  image: string
 }
 
 export interface CreateLobbyResponse {
