@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PlayerBoard } from '@/components/PlayerBoard'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
@@ -9,8 +10,10 @@ import { DrawDeck } from '@/components/DrawDeck'
 import { useBlockLeaving } from '@/hooks/useBlockLeaving'
 import { LeavingDialog } from '@/components/LeavingDialog'
 import { CalculateScore } from '@/components/CalculateScore'
+import { Routes } from '@/routes'
 
 export function Game() {
+  const navigate = useNavigate()
   const { socket } = useSocketConnection()
   const {
     lobby,
@@ -49,9 +52,10 @@ export function Game() {
       setLobby(data)
     })
 
-    socket.on('end-game', () => {
-      // navigate to podium screen
-      console.log('endgame!')
+    socket.on('end-game', (data) => {
+      setShowCalculateScore(false)
+      setLobby(data)
+      navigate(Routes.AWARD)
     })
 
     return () => {
@@ -60,7 +64,7 @@ export function Game() {
       socket.off('finish-round')
       socket.off('end-game')
     }
-  }, [socket, setLobby, setIsReplaceMode, setSuspendedCard])
+  }, [socket, setLobby, setIsReplaceMode, setSuspendedCard, navigate])
 
   function handleClickPile(card: Card | undefined) {
     // player drew a card and will discard it
