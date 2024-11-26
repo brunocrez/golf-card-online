@@ -6,7 +6,6 @@ import { useWindowSize } from '@/hooks/useWindowSize'
 
 import Confetti from 'react-confetti'
 import { Trophy } from 'lucide-react'
-import { trophyColors } from '@/utils/trophyColors'
 
 export function AwardPage() {
   const navigate = useNavigate()
@@ -14,32 +13,57 @@ export function AwardPage() {
   const { width, height } = useWindowSize()
 
   useEffect(() => {
-    console.log(lobby)
     if (!lobby) {
       return navigate(Routes.PRE_LOBBY)
     }
   }, [lobby, navigate])
 
+  const [p1, p2, p3] = lobby?.scoreBoard ?? []
+
   return (
     <>
       <Confetti width={width} height={height} />
       <div className="h-screen w-full flex justify-center items-center">
-        <div className="flex flex-col gap-8">
-          {lobby?.scoreBoard?.slice(0, 3).map((p, idx) => (
-            <div key={p.playerId} className="flex gap-5 items-center">
-              <div className="bg-white flex justify-center items-center rounded-full mb-2 w-16 h-16">
-                <span className="text-xs mr-1">{idx + 1}º</span>
-                <Trophy size={24} className={trophyColors[idx]} />
+        <div className="flex">
+          {/* Segundo Lugar */}
+          <div className="bg-indigo-700 w-24 h-36 self-end rounded-t-md shadow-2xl flex flex-col items-center pt-3 relative">
+            <div className="w-8 h-8 bg-slate-500 rounded-full flex justify-center items-center mb-2">
+              <Trophy size={20} className="text-white" />
+            </div>
+            <p className="text-white font-bold text-xs mb-2">{p2?.nickname}</p>
+            <span className="text-white font-bold text-xs">{p2?.score}</span>
+            <div className="absolute -top-12">
+              <img className="w-10 h-10" src={p2?.image} alt="avatar" />
+            </div>
+          </div>
+
+          {/* Primeiro Lugar */}
+          <div className="bg-indigo-700 w-24 h-44 self-end rounded-t-md shadow-2xl flex flex-col items-center pt-3 relative">
+            <div className="w-8 h-8 bg-yellow-500 rounded-full flex justify-center items-center mb-2">
+              <Trophy size={20} className="text-white" />
+            </div>
+            <p className="text-white font-bold text-xs mb-2">{p1?.nickname}</p>
+            <span className="text-white font-bold text-xs">{p1?.score}</span>
+            <div className="absolute -top-12">
+              <img className="w-10 h-10" src={p1?.image} alt="avatar" />
+            </div>
+          </div>
+
+          {/* Terceiro Lugar */}
+          {p3 && (
+            <div className="bg-indigo-700 w-24 h-24 self-end rounded-t-md shadow-2xl flex flex-col items-center pt-2 relative">
+              <div className="w-8 h-8 bg-yellow-700 rounded-full flex justify-center items-center mb-2">
+                <Trophy size={20} className="text-white" />
               </div>
-              <div className="flex flex-col items-center">
-                <img className="w-20 h-20 mb-2" src={p.image} alt="logo" />
-                <p className="text-sm mb-2">{p.nickname}</p>
-                <div className="bg-green-600 text-white flex justify-center items-center rounded-full w-8 h-8">
-                  <span className="text-white text-sm">{p.score}</span>
-                </div>
+              <p className="text-white font-bold text-xs mb-2">
+                {p3?.nickname}
+              </p>
+              <span className="text-white font-bold text-xs">{p3?.score}</span>
+              <div className="absolute -top-12">
+                <img className="w-10 h-10" src={p3?.image} alt="avatar" />
               </div>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </>
