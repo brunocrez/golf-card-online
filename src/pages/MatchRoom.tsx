@@ -7,7 +7,7 @@ import { Routes } from '@/routes'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
 import { JoinLobbyResponse } from '@/models/Lobby'
-import { IError } from '@/models/Error'
+import { CustomError } from '@/models/Error'
 import { useToast } from '@/hooks/use-toast'
 import { usePlayerContext } from '@/hooks/usePlayerContext'
 
@@ -25,7 +25,7 @@ export function MatchRoom() {
       navigate(`${Routes.LOBBY}/${payload.id}`)
     })
 
-    socket.on('full-lobby', (payload: IError) => {
+    socket.on('error-join-lobby', (payload: CustomError) => {
       setLobby(payload.lobby)
       toast({
         title: payload.message,
@@ -36,7 +36,7 @@ export function MatchRoom() {
 
     return () => {
       socket.off('joined-lobby')
-      socket.off('full-lobby')
+      socket.off('error-join-lobby')
     }
   }, [setLobby, navigate, socket, toast])
 
@@ -53,6 +53,7 @@ export function MatchRoom() {
       lobbyId,
     }
 
+    setError('')
     socket.emit('join-lobby', payload)
   }
 

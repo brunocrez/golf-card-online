@@ -8,6 +8,7 @@ import { Routes } from '@/routes'
 import { CreateLobbyResponse } from '@/models/Lobby'
 import { useGameContext } from '@/hooks/useGameContext'
 import { usePlayerContext } from '@/hooks/usePlayerContext'
+import { CustomError } from '@/models/Error'
 
 export function PreLobbyPage() {
   const navigate = useNavigate()
@@ -22,8 +23,13 @@ export function PreLobbyPage() {
       navigate(`${Routes.LOBBY}/${lobby.id}`)
     })
 
+    socket.on('error-join-lobby', (err: CustomError) => {
+      setError(err.message)
+    })
+
     return () => {
       socket.off('lobby-created')
+      socket.off('error-join-lobby')
       setError('')
     }
   }, [socket, setLobby, navigate, setError])
