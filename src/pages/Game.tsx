@@ -11,10 +11,15 @@ import { useBlockLeaving } from '@/hooks/useBlockLeaving'
 import { LeavingDialog } from '@/components/LeavingDialog'
 import { CalculateScore } from '@/components/CalculateScore'
 import { Routes } from '@/routes'
+import { Sheet } from '@/components/Sheet'
+import { TagRules } from '@/components/TagRules'
+import { TagScore } from '@/components/TagScore'
+import { useSheetContext } from '@/hooks/useSheetContext'
 
 export function Game() {
   const navigate = useNavigate()
   const { socket } = useSocketConnection()
+  const { openSheet, setOpenSheet } = useSheetContext()
   const {
     lobby,
     setLobby,
@@ -136,6 +141,8 @@ export function Game() {
         reset={reset}
       />
 
+      <Sheet open={openSheet} setOpen={setOpenSheet} />
+
       {showCalculateScore && <CalculateScore />}
 
       {/* Cabeçalho fixo do jogador inimigo */}
@@ -191,6 +198,9 @@ export function Game() {
           </div>
         </div>
       </div>
+
+      <TagRules />
+      <TagScore />
 
       {/* Rodapé fixo do jogador atual */}
       <div

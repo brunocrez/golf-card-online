@@ -12,6 +12,7 @@ import { GameContextProvider } from './contexts/GameContext.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
 import { Game } from './pages/Game.tsx'
 import { AwardPage } from './pages/AwardPage.tsx'
+import { SheetContextProvider } from './contexts/SheetContext.tsx'
 
 const client = new QueryClient()
 
@@ -52,7 +53,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={client}>
       <GameContextProvider>
         <PlayerContextProvider>
-          <RouterProvider router={router} />
+          <SheetContextProvider>
+            <RouterProvider router={router} />
+          </SheetContextProvider>
         </PlayerContextProvider>
       </GameContextProvider>
     </QueryClientProvider>

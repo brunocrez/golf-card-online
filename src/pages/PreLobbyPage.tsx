@@ -9,13 +9,17 @@ import { CreateLobbyResponse } from '@/models/Lobby'
 import { useGameContext } from '@/hooks/useGameContext'
 import { usePlayerContext } from '@/hooks/usePlayerContext'
 import { CustomError } from '@/models/Error'
+import { Sheet } from '@/components/Sheet'
+import { useSheetContext } from '@/hooks/useSheetContext'
+import { TagRules } from '@/components/TagRules'
 
 export function PreLobbyPage() {
   const navigate = useNavigate()
   const { nickname, setError, avatars, currIndex } = usePlayerContext()
   const { socket } = useSocketConnection()
   const { setLobby } = useGameContext()
-  const [open, setOpen] = useState(false)
+  const { openSheet, setOpenSheet } = useSheetContext()
+  const [openDialog, setOpenDialog] = useState(false)
 
   useEffect(() => {
     socket.on('lobby-created', (lobby: CreateLobbyResponse) => {
@@ -53,9 +57,12 @@ export function PreLobbyPage() {
 
   return (
     <>
-      <FindLobbyDialog open={open} setOpen={setOpen} />
+      <FindLobbyDialog open={openDialog} setOpen={setOpenDialog} />
+      <Sheet open={openSheet} setOpen={setOpenSheet} />
 
       <div className="flex justify-center items-center h-screen">
+        <TagRules />
+
         <div className="flex flex-col gap-6 px-5">
           <PickAvatar />
 
@@ -68,7 +75,7 @@ export function PreLobbyPage() {
             </Button>
             <Button
               className="bg-green-500 text-white font-bold hover:bg-green-400 w-full"
-              onClick={() => setOpen(true)}
+              onClick={() => setOpenDialog(true)}
             >
               buscar sala
             </Button>

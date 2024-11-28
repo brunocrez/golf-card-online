@@ -22,6 +22,9 @@ export default {
 			animation: {
 				'pulse-green': 'pulseGreen 2s infinite'
 			},
+			backgroundColor: {
+				'primary': '#ececec'
+			},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
