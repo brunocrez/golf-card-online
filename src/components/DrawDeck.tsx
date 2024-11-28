@@ -1,20 +1,14 @@
-import { Card } from '@/models/Card'
 import { Spinner } from './Spinner'
 import { cardSize } from '@/utils/cardSize'
+import { useGameContext } from '@/hooks/useGameContext'
 
 interface DrawDeckProps {
   onClick: () => void
-  suspendedCard: Card | undefined
   isLoading: boolean
-  drewFromDeck: boolean
 }
 
-export function DrawDeck({
-  onClick,
-  suspendedCard,
-  isLoading,
-  drewFromDeck,
-}: DrawDeckProps) {
+export function DrawDeck({ onClick, isLoading }: DrawDeckProps) {
+  const { lobby } = useGameContext()
   return (
     <div
       className={`${cardSize} relative hover:cursor-pointer`}
@@ -22,13 +16,13 @@ export function DrawDeck({
     >
       {isLoading ? (
         <Spinner />
-      ) : suspendedCard && drewFromDeck ? (
+      ) : lobby?.drawnCard ? (
         <div className={`card ${cardSize}`}>
           <div className="card-front">
             <img
               className="w-full h-full"
-              src={suspendedCard?.images.png}
-              alt={suspendedCard?.code}
+              src={lobby?.drawnCard?.images.png}
+              alt={lobby?.drawnCard?.code}
             />
           </div>
         </div>

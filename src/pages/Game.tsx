@@ -58,15 +58,25 @@ export function Game() {
       navigate(Routes.AWARD)
     })
 
+    socket.on('drawn-card', (data) => {
+      setLobby(data)
+    })
+
     return () => {
       socket.off('updated-game')
       socket.off('proceed-to-next-round')
       socket.off('finish-round')
       socket.off('end-game')
+      socket.off('drawn-card')
     }
   }, [socket, setLobby, setIsReplaceMode, setSuspendedCard, navigate])
 
   function handleClickPile(card: Card | undefined) {
+    // prevent player to enter in replace mode if it's not his turn
+    if (lobby?.currentTurn !== socket.id) {
+      return
+    }
+
     // player drew a card and will discard it
     if (drewFromDeck) {
       const payload = {
@@ -169,12 +179,7 @@ export function Game() {
               />
 
               {/* Deck */}
-              <DrawDeck
-                drewFromDeck={drewFromDeck}
-                isLoading={isLoading}
-                onClick={handleClickDeck}
-                suspendedCard={suspendedCard}
-              />
+              <DrawDeck isLoading={isLoading} onClick={handleClickDeck} />
             </div>
 
             <PlayerBoard
