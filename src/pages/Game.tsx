@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { CircleArrowLeft, CircleArrowRight } from 'lucide-react'
 import { PlayerBoard } from '@/components/PlayerBoard'
 import { useGameContext } from '@/hooks/useGameContext'
 import { useSocketConnection } from '@/hooks/useSocketConnection'
@@ -15,6 +16,7 @@ import { Sheet } from '@/components/Sheet'
 import { TagRules } from '@/components/TagRules'
 import { TagScore } from '@/components/TagScore'
 import { useSheetContext } from '@/hooks/useSheetContext'
+import { Button } from '@/components/ui/button'
 
 export function Game() {
   const navigate = useNavigate()
@@ -31,14 +33,22 @@ export function Game() {
     isLoading,
   } = useGameContext()
   const { proceed, reset, state } = useBlockLeaving(lobby?.id ?? '')
-  const { currPlayer, enemy } = getCurrentPlayer(socket, lobby?.players ?? [])
+  const { currPlayer, enemies } = useMemo(() => {
+    const { currPlayer, enemies } = getCurrentPlayer(
+      socket,
+      lobby?.players ?? [],
+    )
+
+    return { currPlayer, enemies }
+  }, [socket, lobby?.players])
 
   const [drewFromDeck, setDrewFromDeck] = useState(false)
   const [showCalculateScore, setShowCalculateScore] = useState(false)
+  const [currEnemyIndex, setCurrEnemyIndex] = useState(0)
   const [, setOpen] = useState(false)
 
   const isMyTurn = lobby?.currentTurn === socket.id
-  const isEnemyTurn = lobby?.currentTurn === enemy.playerId
+  const currTurn = lobby?.currentTurn === enemies[currEnemyIndex]?.playerId
 
   useEffect(() => {
     socket.on('updated-game', (data) => {
@@ -75,6 +85,21 @@ export function Game() {
       socket.off('drawn-card')
     }
   }, [socket, setLobby, setIsReplaceMode, setSuspendedCard, navigate])
+
+  // find index of current player
+  useEffect(() => {
+    if (!lobby || !enemies.length) {
+      return
+    }
+
+    const activeIndex = enemies.findIndex(
+      (enemy) => enemy.playerId === lobby.currentTurn,
+    )
+
+    if (activeIndex !== -1) {
+      setCurrEnemyIndex(activeIndex)
+    }
+  }, [lobby, lobby?.currentTurn, enemies])
 
   function handleClickPile(card: Card | undefined) {
     // prevent player to enter in replace mode if it's not his turn
@@ -145,14 +170,44 @@ export function Game() {
 
       {showCalculateScore && <CalculateScore />}
 
+      {enemies.length > 1 && (
+        <>
+          <Button
+            onClick={() =>
+              setCurrEnemyIndex(
+                (prevState) =>
+                  (prevState - 1 + enemies.length) % enemies.length,
+              )
+            }
+            className="bg-transparent hover:bg-transparent p-0 absolute top-2 left-2 z-10"
+          >
+            <CircleArrowLeft size={24} className="text-white" />
+          </Button>
+          <Button
+            onClick={() =>
+              setCurrEnemyIndex((prevState) => (prevState + 1) % enemies.length)
+            }
+            className="bg-transparent hover:bg-transparent p-0 absolute top-2 right-2 z-10"
+          >
+            <CircleArrowRight size={24} className="text-white" />
+          </Button>
+        </>
+      )}
+
       {/* Cabeçalho fixo do jogador inimigo */}
       <div
         className={`fixed top-0 left-0 w-full flex justify-center items-center gap-4 p-3 ${
-          isEnemyTurn ? 'animate-pulse-green' : 'bg-slate-500'
+          currTurn ? 'animate-pulse-green' : 'bg-slate-500'
         }`}
       >
-        <img src={enemy.image} className="w-8 h-8" alt="avatar" />
-        <p className="text-white font-bold text-sm">{enemy.nickname}</p>
+        <img
+          src={enemies[currEnemyIndex]?.image}
+          className="w-8 h-8"
+          alt="avatar"
+        />
+        <p className="text-white font-bold text-sm">
+          {enemies[currEnemyIndex]?.nickname}
+        </p>
       </div>
 
       {/* Container principal */}
@@ -170,9 +225,9 @@ export function Game() {
             onClick={(e) => e.stopPropagation()}
           >
             <PlayerBoard
-              cards={enemy.cards ?? []}
+              cards={enemies[currEnemyIndex]?.cards ?? []}
               isCurrentPlayer={false}
-              scoreArray={enemy.score}
+              scoreArray={enemies[currEnemyIndex]?.score}
               scorePosition="top"
             />
 
